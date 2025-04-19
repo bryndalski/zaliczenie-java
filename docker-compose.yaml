@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: ./services/auth-service
+    ports:
+      - "8081:8080"
+    depends_on:
+      - rabbitmq
+      - user_mongo_db
+      - notes_mongo_db
+
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "8082:8080"
+    depends_on:
+      - rabbitmq
+      - user_mongo_db
+      - notes_mongo_db
+
+  notes-service:
+    build: ./services/notes-service
+    ports:
+      - "8083:8080"
+    depends_on:
+      - rabbitmq
+      - user_mongo_db
+      - notes_mongo_db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  user_mongo_db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo1_data:/data/db
+
+  notes_mongo_db:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo2_data:/data/db
+
+  load-balancer:
+    image: dockercloud/haproxy
+    links:
+      - auth-service
+      - user-service
+      - notes-service
+    ports:
+      - "80:80"
+    environment:
+      - BALANCE=roundrobin
+      - MODE=http
+      - STATS_PORT=1936
+      - STATS_AUTH=admin:admin
+
+volumes:
+  rabbitmq_data:
+  mongo1_data:
+  mongo2_data:
