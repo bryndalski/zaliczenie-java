@@ -1,9 +1,0 @@
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/security/CustomUserDetailsService.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/service/AuthService.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/model/User.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/config/SecurityConfig.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/security/JwtTokenProvider.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/repository/UserRepository.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/security/JwtAuthenticationFilter.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/AuthApplication.java
-/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/services/auth-app/src/main/java/com/example/auth/controller/AuthController.java

@@ -1,8 +1,0 @@
-spring:
-  data:
-    mongodb:
-      uri: mongodb://notes_mongo_db:27017/notes
-  application:
-    name: notes-service
-server:
-  port: 8080
