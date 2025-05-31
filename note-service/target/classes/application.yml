@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8083}  # Use environment variable, default to 8083
+  port: ${SERVER_PORT:8080}  # Changed from 8083 to 8080 to match docker-compose
 
 spring:
   profiles:

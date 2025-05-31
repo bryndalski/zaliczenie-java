@@ -18,6 +18,14 @@ A complete microservices architecture built with Java Spring Boot, featuring aut
 
 > **Note**: Only NGINX exposes port 80 to the host. All other services run on internal Docker network.
 
+**Alternative Direct Access Ports:**
+
+If NGINX access fails, you can directly access services on these ports:
+- Auth Service: http://localhost:8091
+- User Service: http://localhost:8092
+- Note Service: http://localhost:8093
+- Keycloak: http://localhost:8095
+
 ## 🏗️ Architecture Overview
 
 ```

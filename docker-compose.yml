@@ -13,7 +13,7 @@ services:
       - auth-service
       - user-service
       - note-service
-      - keycloak # Ensure Keycloak is listed here
+      - keycloak
     networks:
       - microservices-network
     healthcheck:
@@ -21,16 +21,16 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
-      start_period: 30s # Reduced from 120s
+      start_period: 30s
     restart: unless-stopped
 
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
       URLS: '[
-        {"url": "http://auth-service:8080/v3/api-docs", "name": "Auth Service"},
-        {"url": "http://user-service:8080/v3/api-docs", "name": "User Service"},
-        {"url": "http://note-service:8080/v3/api-docs", "name": "Note Service"}
+        {"url": "/api/auth/v3/api-docs", "name": "Auth Service"},
+        {"url": "/api/users/v3/api-docs", "name": "User Service"},
+        {"url": "/api/notes/v3/api-docs", "name": "Note Service"}
       ]'
       BASE_URL: /swagger-ui
     networks:
@@ -83,7 +83,7 @@ services:
       start_period: 120s  # Reduced start period
     restart: unless-stopped
     ports:
-      - "8080:8080"  # Keep this for direct Keycloak access/debugging
+      - "8095:8080"  # Changed from 8080:8080 to avoid conflicts
 
   keycloak-db:
     image: postgres:15
