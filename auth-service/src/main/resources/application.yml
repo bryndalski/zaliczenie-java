@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: docker
+  data:
+    mongodb:
+      host: ${MONGO_HOST:localhost}
+      port: ${MONGO_PORT:27017}
+      database: ${MONGO_DATABASE:auth_db}
+      username: ${MONGO_USERNAME:auth_admin}
+      password: ${MONGO_PASSWORD:auth_pass123}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:microservices-realm}
+
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8080}
+  realm: ${KEYCLOAK_REALM:microservices-realm}
+  resource: ${KEYCLOAK_CLIENT_ID:microservices-client}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:your-client-secret-here}
+  use-resource-role-mappings: true
+  bearer-only: true
+
+logging:
+  level:
+    com.microservices.auth: DEBUG
+    org.springframework.security: DEBUG
