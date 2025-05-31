@@ -117,4 +117,35 @@ public class AuthService {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
+    // Add simple health check method
+    public ResponseEntity<?> healthCheck() {
+        Map<String, String> health = new HashMap<>();
+        health.put("status", "UP");
+        health.put("service", "auth-service");
+        health.put("timestamp", String.valueOf(System.currentTimeMillis()));
+        return ResponseEntity.ok(health);
+    }
+
+    // Add API documentation endpoint as swagger-ui alternative
+    public ResponseEntity<?> getApiDocumentation() {
+        Map<String, Object> apiDoc = new HashMap<>();
+        apiDoc.put("service", "auth-service");
+        apiDoc.put("version", "1.0.0");
+        apiDoc.put("description", "Authentication service for microservices architecture");
+
+        Map<String, Object> endpoints = new HashMap<>();
+        endpoints.put("POST /login", "Login with username/password");
+        endpoints.put("POST /logout", "Logout user");
+        endpoints.put("POST /refresh", "Refresh access token");
+        endpoints.put("POST /reset-password", "Reset user password");
+        endpoints.put("GET /me", "Get current user info");
+        endpoints.put("GET /health", "Service health check");
+        endpoints.put("GET /api-docs", "This API documentation");
+
+        apiDoc.put("endpoints", endpoints);
+        apiDoc.put("baseUrl", "/auth");
+
+        return ResponseEntity.ok(apiDoc);
+    }
 }

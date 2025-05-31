@@ -76,4 +76,16 @@ public class AuthController {
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         return authService.getCurrentUser(authentication);
     }
+
+    @GetMapping("/health")
+    @Operation(summary = "Health check", description = "Simple health check endpoint")
+    public ResponseEntity<?> health() {
+        return authService.healthCheck();
+    }
+
+    @GetMapping("/api-docs")
+    @Operation(summary = "API Documentation", description = "Get API documentation for auth service")
+    public ResponseEntity<?> apiDocs() {
+        return authService.getApiDocumentation();
+    }
 }
