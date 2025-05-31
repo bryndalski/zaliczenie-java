@@ -142,6 +142,7 @@ public class AuthService {
         endpoints.put("GET /me", "Get current user info");
         endpoints.put("GET /health", "Service health check");
         endpoints.put("GET /api-docs", "This API documentation");
+        endpoints.put("GET /v3/api-docs", "OpenAPI 3.0 documentation (for Swagger UI)");
 
         apiDoc.put("endpoints", endpoints);
         apiDoc.put("baseUrl", "/auth");

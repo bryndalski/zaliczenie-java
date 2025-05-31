@@ -11,6 +11,24 @@ spring:
         username: ${NEO4J_USERNAME:neo4j}
         password: ${NEO4J_PASSWORD:password}
 
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: false  # Disable built-in swagger UI since we use external one
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
 logging:
   level:
     com.microservices.note: DEBUG

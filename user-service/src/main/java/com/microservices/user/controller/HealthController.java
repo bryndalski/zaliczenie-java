@@ -40,6 +40,7 @@ public class HealthController {
         endpoints.put("PUT /{id}", "Update user");
         endpoints.put("DELETE /{id}", "Delete user");
         endpoints.put("GET /health", "Health check");
+        endpoints.put("GET /v3/api-docs", "OpenAPI 3.0 documentation (for Swagger UI)");
         
         apiDoc.put("endpoints", endpoints);
         apiDoc.put("baseUrl", "/users");

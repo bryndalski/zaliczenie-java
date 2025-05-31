@@ -26,26 +26,18 @@ public class HealthController {
         return ResponseEntity.ok(health);
     }
 
-    @GetMapping("/api-docs")
-    @Operation(summary = "API Documentation", description = "Get API documentation for note service")
-    public ResponseEntity<?> apiDocs() {
-        Map<String, Object> apiDoc = new HashMap<>();
-        apiDoc.put("service", "note-service");
-        apiDoc.put("version", "1.0.0");
-        apiDoc.put("description", "Note management service with graph relationships");
-        
-        Map<String, String> endpoints = new HashMap<>();
-        endpoints.put("POST /", "Create new note");
-        endpoints.put("GET /{id}", "Get note by ID");
-        endpoints.put("PUT /{id}", "Update note");
-        endpoints.put("DELETE /{id}", "Delete note");
-        endpoints.put("POST /share", "Share note with permissions");
-        endpoints.put("GET /health", "Health check");
-        endpoints.put("POST /graphql", "GraphQL endpoint");
-        
-        apiDoc.put("endpoints", endpoints);
-        apiDoc.put("baseUrl", "/notes");
-        
-        return ResponseEntity.ok(apiDoc);
+    @GetMapping("/notes")
+    @Operation(summary = "Get all notes", description = "Retrieve all notes for testing")
+    @ApiResponse(responseCode = "200", description = "Notes retrieved successfully")
+    public ResponseEntity<?> getAllNotes() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Notes endpoint - GraphQL available at /graphql");
+        response.put("service", "note-service");
+        response.put("endpoints", Map.of(
+            "graphql", "/graphql",
+            "health", "/health",
+            "api-docs", "/v3/api-docs"
+        ));
+        return ResponseEntity.ok(response);
     }
 }
