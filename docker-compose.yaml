@@ -3,10 +3,12 @@ services:
     build: ./services/auth-app
     ports:
       - "8081:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://user_mongo_db:27017/authdb
     depends_on:
-      - rabbitmq
       - user_mongo_db
-      - notes_mongo_db
+    networks:
+      - app-network
 
   user-service:
     build: ./services/main
@@ -43,6 +45,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo1_data:/data/db
+    networks:
+      - app-network
 
   notes_mongo_db:
     image: mongo:latest
@@ -69,3 +73,7 @@ volumes:
   rabbitmq_data:
   mongo1_data:
   mongo2_data:
+
+networks:
+  app-network:
+    driver: bridge

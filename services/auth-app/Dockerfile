@@ -4,11 +4,8 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml file to the container
-COPY pom.xml .
-
-# Copy the src directory to the container
-COPY src ./src
+# Copy the entire project directory to the container
+COPY . .
 
 # Package the application, skipping tests
 RUN mvn clean package -DskipTests
