@@ -61,6 +61,7 @@ quick_service_check() {
     return 1
 }
 
+
 # Check prerequisites
 echo "🔍 Checking prerequisites..."
 check_command docker
@@ -78,6 +79,20 @@ if ! docker info > /dev/null 2>&1; then
     echo "❌ Error: Docker is not running. Please start Docker and try again."
     exit 1
 fi
+
+# Check docker-compose version and config before proceeding
+echo "🔍 Checking docker-compose version..."
+docker-compose version || {
+    echo "❌ docker-compose is not installed or not working."
+    exit 1
+}
+
+echo "🔍 Validating docker-compose.yml syntax..."
+if ! docker-compose config -q; then
+    echo "❌ docker-compose.yml is invalid. Please fix the configuration errors above."
+    exit 1
+fi
+
 
 # Stop any existing containers
 echo "📦 Stopping existing containers..."
@@ -130,20 +145,47 @@ sleep 15
 echo "🔑 Starting Keycloak (may take 2-3 minutes)..."
 docker-compose up -d keycloak
 
-# Check for Keycloak startup issues specifically
-echo "🔍 Monitoring Keycloak startup..."
-sleep 10
+# Specific Keycloak startup monitoring
+echo "🔍 Monitoring Keycloak startup process..."
+keycloak_attempts=0
+max_keycloak_attempts=24  # 4 minutes at 10s intervals
 
-# Check if Keycloak container is running and not restarting
-if ! docker-compose ps keycloak | grep -q "Up"; then
-    echo "❌ Keycloak failed to start properly"
-    echo "📋 Keycloak logs:"
-    docker-compose logs --tail=20 keycloak
-    echo "🔄 Attempting manual Keycloak restart..."
-    docker-compose stop keycloak
-    docker-compose rm -f keycloak
-    sleep 5
-    docker-compose up -d keycloak
+while [ $keycloak_attempts -lt $max_keycloak_attempts ]; do
+    # Check if Keycloak container is running
+    if ! docker-compose ps keycloak | grep -q "Up"; then
+        echo "❌ Keycloak container is not running, checking logs..."
+        docker-compose logs --tail=10 keycloak
+        echo "🔄 Restarting Keycloak..."
+        docker-compose restart keycloak
+        sleep 20
+        keycloak_attempts=$((keycloak_attempts + 2))
+        continue
+    fi
+    
+    # Check if Keycloak is responding
+    if curl -s -f "http://localhost:8080" > /dev/null 2>&1; then
+        echo "✅ Keycloak is responding on port 8080"
+        break
+    elif wget -q --spider "http://localhost:8080" 2>/dev/null; then
+        echo "✅ Keycloak is responding (via wget)"
+        break
+    fi
+    
+    echo "   Attempt $((keycloak_attempts + 1))/$max_keycloak_attempts - Keycloak not ready yet..."
+    echo "   Container status: $(docker-compose ps keycloak | grep keycloak | awk '{print $4}')"
+    sleep 10
+    keycloak_attempts=$((keycloak_attempts + 1))
+done
+
+if [ $keycloak_attempts -ge $max_keycloak_attempts ]; then
+    echo "❌ Keycloak failed to become ready after 4 minutes"
+    echo "📋 Final Keycloak logs:"
+    docker-compose logs --tail=50 keycloak
+    echo "🔄 Attempting one final restart..."
+    docker-compose restart keycloak
+    sleep 30
+else
+    echo "✅ Keycloak is ready!"
 fi
 
 # Wait specifically for Keycloak container creation
@@ -222,19 +264,31 @@ else
     nginx_ready=false
 fi
 
-# Test alternative NGINX port
-if curl -s -f "http://localhost:8080/health" > /dev/null 2>&1; then
-    echo "✅ NGINX (8080): Ready"
-    nginx_alt_ready=true
+# Remove the NGINX 8080 test since we removed that port mapping
+# Test NGINX Swagger UI endpoint specifically
+if curl -s -f "http://localhost/swagger-ui/" > /dev/null 2>&1; then
+    echo "✅ NGINX Swagger UI: Ready"
+    swagger_ready=true
 else
-    echo "⚠️  NGINX (8080): Not ready yet"
-    nginx_alt_ready=false
+    echo "⚠️  NGINX Swagger UI: Not ready yet"
+    swagger_ready=false
 fi
 
 # Test direct service ports
 quick_service_check "Auth Service" 8091
 quick_service_check "User Service" 8092
 quick_service_check "Note Service" 8093
+
+# Test Keycloak specifically
+echo ""
+echo "🧪 Testing Keycloak connectivity..."
+if curl -s -f "http://localhost:8080" > /dev/null 2>&1; then
+    echo "✅ Keycloak: Ready on port 8080"
+    keycloak_ready=true
+else
+    echo "⚠️  Keycloak: Not responding on port 8080"
+    keycloak_ready=false
+fi
 
 # Additional diagnostic info
 echo ""
@@ -249,14 +303,15 @@ docker stats --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsa
 echo ""
 echo "🎯 Access Points (Available Now):"
 echo "  Main URL:     http://localhost"
-echo "  Alternative:  http://localhost:8080"
+echo "  Swagger UI:   http://localhost/swagger-ui/"
 echo "  Debug Info:   http://localhost/debug"
 echo "  Health Check: http://localhost/health"
 echo ""
 echo "🔧 Direct Service Access:"
-echo "  Auth Service:  http://localhost:8091"   # Updated
-echo "  User Service:  http://localhost:8092"   # Updated
-echo "  Note Service:  http://localhost:8093"   # Updated
+echo "  Keycloak:      http://localhost:8080"
+echo "  Auth Service:  http://localhost:8091"
+echo "  User Service:  http://localhost:8092"
+echo "  Note Service:  http://localhost:8093"
 echo ""
 
 # Restore override file if it was backed up
@@ -266,11 +321,13 @@ if [ -f "docker-compose.override.yml.bak" ]; then
 fi
 
 # Final status
-if [ "$nginx_ready" = true ] || [ "$nginx_alt_ready" = true ]; then
+if [ "$nginx_ready" = true ]; then
     echo "🎉 NGINX is working! You can start using the system."
     echo "🌐 Primary access: http://localhost"
-    if [ "$nginx_alt_ready" = true ] && [ "$nginx_ready" = false ]; then
-        echo "🌐 Use alternative port: http://localhost:8080"
+    if [ "$swagger_ready" = true ]; then
+        echo "📊 Swagger UI: http://localhost/swagger-ui/"
+    else
+        echo "⚠️  Swagger UI not ready yet, try again in a few minutes"
     fi
 else
     echo "⚠️  NGINX not responding yet. Try direct service ports above."

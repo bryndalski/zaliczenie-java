@@ -135,17 +135,70 @@ pull-images:
 	
 help:
 	@echo "Available commands:"
-	@echo "  build            - Build all services"
-	@echo "  up               - Start all services"
-	@echo "  down             - Stop all services"
-	@echo "  clean            - Clean everything including volumes"
-	@echo "  logs             - View all logs"
-	@echo "  start-fast       - Start using the optimized start.sh script"
-	@echo "  keycloak-fix     - Fix Keycloak startup issues"
-	@echo "  keycloak-logs-live - Watch Keycloak logs in real-time"
-	@echo "  keycloak-debug   - Debug Keycloak specifically"
-	@echo "  keycloak-restart - Restart just Keycloak"
-	@echo "  keycloak-reset   - Reset Keycloak completely"
-	@echo "  pull-images      - Pre-pull all container images"
-	@echo "  force-rebuild    - Force rebuild everything from scratch"
-	@echo "  help             - Show this help message"
+	@echo "  build              - Build all services"
+	@echo "  up                 - Start all services"
+	@echo "  down               - Stop all services"
+	@echo "  clean              - Clean everything including volumes"
+	@echo "  clear-ports        - Kill processes using ports 80, 443, 8080"
+	@echo "  start-clean        - Clear ports and run start.sh"
+	@echo "  logs               - View all logs"
+	@echo "  swagger            - Open Swagger UI"
+	@echo "  setup-keycloak     - Set up Keycloak realm and client"
+	@echo "  setup              - Build, up, setup-keycloak, and swagger"
+	@echo "  test-api           - Print test API commands"
+	@echo "  diagnose            - Show Docker system information and running containers"
+	@echo "  keycloak-logs      - View Keycloak logs"
+	@echo "  keycloak-debug     - Debug Keycloak container"
+	@echo "  keycloak-restart   - Restart Keycloak"
+	@echo "  keycloak-reset     - Reset Keycloak data"
+	@echo "  keycloak-fix       - Fix Keycloak configuration issues"
+	@echo "  keycloak-logs-live - Tail Keycloak logs"
+	@echo "  force-rebuild      - Rebuild services from scratch"
+	@echo "  pull-images        - Pre-pull all container images"
+	@echo "  help               - Show this help message"
+	@echo "  keycloak-test      - Test Keycloak connectivity"
+	@echo "  keycloak-force-fix - Force fix Keycloak issues"
+
+keycloak-test:
+	@echo "🧪 Testing Keycloak connectivity..."
+	@echo "Direct access test:"
+	@curl -s -I http://localhost:8080 || echo "❌ Direct access failed"
+	@echo ""
+	@echo "Health endpoint test:"
+	@curl -s -I http://localhost:8080/health/ready || echo "❌ Health endpoint not ready"
+	@echo ""
+	@echo "Admin console test:"
+	@curl -s -I http://localhost:8080/admin || echo "❌ Admin console not accessible"
+
+keycloak-force-fix:
+	@echo "🔧 Force fixing Keycloak issues..."
+	docker-compose stop keycloak
+	docker-compose rm -f keycloak
+	@echo "Clearing any conflicting containers..."
+	docker ps -a | grep keycloak | awk '{print $$1}' | xargs -r docker rm -f
+	@echo "Starting fresh Keycloak..."
+	docker-compose up -d keycloak-db
+	sleep 10
+	docker-compose up -d keycloak
+	@echo "✅ Keycloak restart initiated. Wait 2-3 minutes then run 'make keycloak-test'"
+
+clear-ports:
+	@echo "🔫 Clearing ports 80, 443, and 8080..."
+	@if command -v lsof >/dev/null 2>&1; then \
+		echo "Using lsof to find and kill processes..."; \
+		lsof -ti :80 2>/dev/null | xargs -r kill -9 || echo "Port 80 clear"; \
+		lsof -ti :443 2>/dev/null | xargs -r kill -9 || echo "Port 443 clear"; \
+		lsof -ti :8080 2>/dev/null | xargs -r kill -9 || echo "Port 8080 clear"; \
+	elif command -v netstat >/dev/null 2>&1; then \
+		echo "Using netstat to find processes..."; \
+		netstat -tlnp 2>/dev/null | grep ":80 " | awk '{print $$7}' | cut -d'/' -f1 | grep -v - | xargs -r kill -9 || echo "Port 80 clear"; \
+		netstat -tlnp 2>/dev/null | grep ":443 " | awk '{print $$7}' | cut -d'/' -f1 | grep -v - | xargs -r kill -9 || echo "Port 443 clear"; \
+		netstat -tlnp 2>/dev/null | grep ":8080 " | awk '{print $$7}' | cut -d'/' -f1 | grep -v - | xargs -r kill -9 || echo "Port 8080 clear"; \
+	else \
+		echo "❌ Cannot clear ports (no lsof or netstat available)"; \
+	fi
+	@echo "✅ Port clearing completed"
+
+start-clean: clear-ports
+	@echo "🚀 Starting with clean ports..."
+	./start.sh
