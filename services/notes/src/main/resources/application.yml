@@ -1,5 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://admin:admin@localhost:27017/
-      database: users
+      uri: mongodb://notes_mongo_db:27017/notes
+  application:
+    name: notes-service
+server:
+  port: 8080

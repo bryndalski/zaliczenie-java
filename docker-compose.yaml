@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   auth-service:
-    build: ./services/auth-service
+    build: ./services/auth-app
     ports:
       - "8081:8080"
     depends_on:
@@ -11,7 +9,7 @@ services:
       - notes_mongo_db
 
   user-service:
-    build: ./services/user-service
+    build: ./services/main
     ports:
       - "8082:8080"
     depends_on:
@@ -20,7 +18,7 @@ services:
       - notes_mongo_db
 
   notes-service:
-    build: ./services/notes-service
+    build: ./services/notes
     ports:
       - "8083:8080"
     depends_on:

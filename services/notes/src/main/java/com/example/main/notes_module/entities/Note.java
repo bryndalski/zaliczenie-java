@@ -1,13 +1,14 @@
 package com.example.main.notes_module.entities;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,27 +16,32 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@With
 @Document(collection = "note")
 public class Note {
-
     @Id
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
-    private String authorId;
+    @NotNull
+    private UUID userId;  // Added this field
 
+    @NotNull
+    private UUID authorId;
+
+    @NotNull
     private String title;
 
     private String content;
 
-    private LocalDate createdAt;
+    @CreatedDate
+    private LocalDate createdAt = LocalDate.now();
 
-    private LocalDate updatedAt;
+    @LastModifiedDate
+    private LocalDate updatedAt = LocalDate.now();
 
-    private boolean isArchived;
+    private boolean isArchived = false;
 
     private LocalDate archivedAt;
 
-    private List<String> shearedPeopleIds;
-
-
+    private List<String> shearedPeopleIds = new ArrayList<>();
 }

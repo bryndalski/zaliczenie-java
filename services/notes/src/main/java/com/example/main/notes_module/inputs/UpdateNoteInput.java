@@ -17,4 +17,16 @@ public class UpdateNoteInput {
 
     @NotBlank(message = "Content cannot be blank")
     private String content;
+
+    public UUID getUserId() { return userId; }
+    public void setUserId(UUID userId) { this.userId = userId; }
+
+    public UUID getNoteId() { return noteId; }
+    public void setNoteId(UUID noteId) { this.noteId = noteId; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 }

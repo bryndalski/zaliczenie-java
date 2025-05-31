@@ -15,13 +15,13 @@ public interface NoteRepository extends MongoRepository<Note, UUID> {
     List<Note> findByUserId(UUID userId);
 
     // Get all archived notes by user
-    List<Note> findByUserIdAndArchivedTrue(UUID userId);
+    List<Note> findByUserIdAndIsArchivedTrue(UUID userId);
 
     // Get a specific note by ID
     Optional<Note> findById(UUID noteId);
 
     // Get all active (non-archived) notes
-    List<Note> findByUserIdAndArchivedFalse(UUID userId);
+    List<Note> findByAuthorIdAndIsArchivedFalse(UUID userId);
 
     // Save or update note
     default Note saveNote(Note note) {

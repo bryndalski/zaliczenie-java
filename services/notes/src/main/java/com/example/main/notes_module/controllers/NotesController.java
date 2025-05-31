@@ -1,6 +1,8 @@
 package com.example.main.notes_module.controllers;
 
-import com.example.main.notes_module.models.Note;
+import com.example.main.notes_module.entities.Note;
+import com.example.main.notes_module.inputs.CreateNoteInput;
+import com.example.main.notes_module.inputs.UpdateNoteInput;
 import com.example.main.notes_module.services.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/notes")
@@ -25,8 +28,10 @@ public class NotesController {
 
     // Get a single note by ID
     @GetMapping("/{noteId}")
-    public Optional<Note> getNoteById(@PathVariable UUID noteId) {
-        return noteService.getNoteById(noteId);
+    public ResponseEntity<Note> getNoteById(@PathVariable UUID noteId) {
+        return noteService.getNoteById(noteId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Delete a note by ID
@@ -37,8 +42,8 @@ public class NotesController {
 
     // Update a note
     @PutMapping("/{noteId}")
-    public Note updateNote(@PathVariable UUID noteId, @Valid @RequestBody Note note) {
-        return noteService.updateNote(noteId, note);
+    public ResponseEntity<Note> updateNote(@PathVariable UUID noteId, @Valid @RequestBody UpdateNoteInput note) {
+        return ResponseEntity.ok(noteService.updateNote(noteId, note));
     }
 
     // Archive a note
@@ -51,5 +56,11 @@ public class NotesController {
     @GetMapping("/user/{userId}/archived")
     public List<Note> getArchivedNotes(@PathVariable UUID userId) {
         return noteService.getArchivedNotesByUserId(userId);
+    }
+
+    // Create a new note
+    @PostMapping
+    public ResponseEntity<Note> createNote(@Valid @RequestBody CreateNoteInput input) {
+        return ResponseEntity.ok(noteService.createNote(input));
     }
 }
