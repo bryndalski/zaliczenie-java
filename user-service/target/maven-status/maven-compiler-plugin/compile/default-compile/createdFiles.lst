@@ -1,1 +1,2 @@
 com/microservices/user/UserServiceApplication.class
+com/microservices/user/controller/HealthController.class
