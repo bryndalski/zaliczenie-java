@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8080  # Fixed to 8080 for internal Docker communication
 
 spring:
   profiles:
