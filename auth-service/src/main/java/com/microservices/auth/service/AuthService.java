@@ -6,7 +6,6 @@ import com.microservices.auth.dto.RegisterRequest;
 import com.microservices.auth.dto.ResetPasswordRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -122,14 +121,12 @@ public class AuthService {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            Map<String, Object> userInfo = new HashMap<>();
-            userInfo.put("username", authentication.getName());
-            userInfo.put("authorities", authentication.getAuthorities());
-            return ResponseEntity.ok(userInfo);
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<?> getCurrentUser(String username) {
+        // Simplified without Spring Security Authentication
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("username", username);
+        userInfo.put("status", "authenticated");
+        return ResponseEntity.ok(userInfo);
     }
 
     // Add simple health check method
