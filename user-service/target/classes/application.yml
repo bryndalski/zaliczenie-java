@@ -8,9 +8,11 @@ spring:
     mongodb:
       host: ${MONGO_HOST:localhost}
       port: ${MONGO_PORT:27017}
-      database: ${MONGO_DATABASE:user_db}
+      database: ${MONGO_DATABASE:users}
       username: ${MONGO_USERNAME:user_admin}
       password: ${MONGO_PASSWORD:user_pass123}
+      authentication-database: admin
+      auto-index-creation: true
 
 # API Key configuration
 app:
@@ -41,3 +43,4 @@ management:
 logging:
   level:
     com.microservices.user: DEBUG
+    org.springframework.data.mongodb: DEBUG

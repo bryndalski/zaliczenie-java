@@ -3,6 +3,8 @@ package com.microservices.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +16,9 @@ import java.util.Map;
 @Tag(name = "Health", description = "Health check endpoints")
 public class HealthController {
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Check if the user service is running")
     @ApiResponse(responseCode = "200", description = "Service is healthy")
@@ -23,6 +28,17 @@ public class HealthController {
         health.put("service", "user-service");
         health.put("timestamp", System.currentTimeMillis());
         health.put("version", "1.0.0");
+        
+        // Check MongoDB connection
+        try {
+            mongoTemplate.getDb().runCommand(new org.bson.Document("ping", 1));
+            health.put("mongodb", "CONNECTED");
+            health.put("database", mongoTemplate.getDb().getName());
+        } catch (Exception e) {
+            health.put("mongodb", "DISCONNECTED");
+            health.put("mongodb_error", e.getMessage());
+        }
+        
         return ResponseEntity.ok(health);
     }
 
