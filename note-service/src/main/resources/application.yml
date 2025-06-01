@@ -18,6 +18,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: false  # Disable built-in swagger UI since we use external one
+  servers:
+    - url: /api/notes
+      description: Note Service API
 
 # Actuator configuration
 management:

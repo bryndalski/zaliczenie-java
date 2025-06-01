@@ -35,6 +35,12 @@ services:
       BASE_URL: /swagger-ui
       SWAGGER_JSON_URL: ""
       VALIDATOR_URL: "null"
+      # Tell Swagger UI to use the correct server URLs
+      API_URLS: '[
+        {"url": "/api/auth/v3/api-docs", "name": "Auth Service"},
+        {"url": "/api/users/v3/api-docs", "name": "User Service"},
+        {"url": "/api/notes/v3/api-docs", "name": "Note Service"}
+      ]'
       # Disable Swagger UI try it functionality to avoid CORS issues
       DISABLE_SWAGGER_DEFAULT_URL: "true"
     networks:
@@ -52,9 +58,10 @@ services:
     environment:
       # Crucial for reverse proxy setup
       KC_PROXY: "edge"
-      KC_HTTP_RELATIVE_PATH: "/keycloak"
+      PROXY_ADDRESS_FORWARDING: "true"
       KC_HOSTNAME_URL: "http://localhost/keycloak"
       KC_HOSTNAME_ADMIN_URL: "http://localhost/keycloak"
+      KC_FRONTEND_URL: "http://localhost/keycloak"
       
       # Existing variables
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}

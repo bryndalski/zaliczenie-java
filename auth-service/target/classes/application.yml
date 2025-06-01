@@ -19,6 +19,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: false
+  servers:
+    - url: /api/auth
+      description: Auth Service API
 
 # Actuator configuration
 management:
