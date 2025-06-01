@@ -1,6 +1,7 @@
 package com.microservices.auth.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
@@ -12,42 +13,36 @@ public class InitializationService implements CommandLineRunner {
     @Autowired
     private UserServiceClient userServiceClient;
 
-    @Autowired
-    private KeycloakService keycloakService;
+    @Value("${ADMIN_EMAIL:admin@admin.com}")
+    private String adminEmail;
+
+    @Value("${ADMIN_NAME:Admin}")
+    private String adminName;
+
+    @Value("${ADMIN_SURNAME:User}")
+    private String adminSurname;
 
     @Override
     public void run(String... args) throws Exception {
         try {
-            // Check if admin user already exists
-            if (!userServiceClient.userExistsByEmail("admin@admin.com")) {
-                // Create admin user in user-service
+            // Only create user profile in user-service (Keycloak users come from realm import)
+            if (!userServiceClient.userExistsByEmail(adminEmail)) {
                 userServiceClient.createUser(
-                    "Admin",
-                    "User", 
-                    "admin@admin.com",
+                    adminName,
+                    adminSurname, 
+                    adminEmail,
                     LocalDate.of(1990, 1, 1).toString(),
                     "ADMIN"
                 );
                 
-                // Create admin user in Keycloak
-                keycloakService.createUser(
-                    "admin",
-                    "admin@admin.com", 
-                    "zaq1@WSX",
-                    "Admin",
-                    "User"
-                );
-                
-                System.out.println("✅ Admin user created successfully:");
-                System.out.println("   Email: admin@admin.com");
-                System.out.println("   Username: admin");
-                System.out.println("   Password: zaq1@WSX");
+                System.out.println("✅ Admin user profile created in user-service:");
+                System.out.println("   Email: " + adminEmail);
+                System.out.println("   Note: Login credentials are handled by Keycloak realm import");
             } else {
-                System.out.println("ℹ️ Admin user already exists");
+                System.out.println("ℹ️ Admin user profile already exists in user-service");
             }
         } catch (Exception e) {
-            System.err.println("❌ Failed to create admin user: " + e.getMessage());
-            // Don't throw exception to avoid startup failure
+            System.err.println("❌ Failed to create admin user profile: " + e.getMessage());
         }
     }
 }

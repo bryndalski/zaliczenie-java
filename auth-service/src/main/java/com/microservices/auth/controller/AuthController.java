@@ -66,16 +66,14 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    @Operation(summary = "Get current user", description = "Get current authenticated user information")
+    @Operation(summary = "Get current user", description = "Get current authenticated user information from JWT token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User information retrieved"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing token")
     })
-    public ResponseEntity<?> getCurrentUser(@RequestParam(required = false) String username) {
-        if (username == null || username.isEmpty()) {
-            username = "guest";
-        }
-        return authService.getCurrentUser(username);
+    public ResponseEntity<?> getCurrentUser(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        return authService.getCurrentUser(authorizationHeader);
     }
 
     @GetMapping("/health")

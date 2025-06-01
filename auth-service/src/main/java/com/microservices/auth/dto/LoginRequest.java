@@ -1,10 +1,12 @@
 package com.microservices.auth.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequest {
-    @NotBlank(message = "Username is required")
-    private String username;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please provide a valid email address")
+    private String username; // Keep field name as 'username' for compatibility, but validate as email
     
     @NotBlank(message = "Password is required")
     private String password;

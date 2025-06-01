@@ -88,20 +88,32 @@ public class KeycloakService {
         }
     }
     
-    public boolean userExistsInKeycloak(String username) {
-        String adminToken = getAdminToken();
-        String usersUrl = keycloakUrl + "/admin/realms/" + realm + "/users?username=" + username;
-        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(adminToken);
-        
-        HttpEntity<String> request = new HttpEntity<>(headers);
-        
+    public boolean userExistsInKeycloak(String emailOrUsername) {
         try {
+            String adminToken = getAdminToken();
+            
+            // Try by email first
+            String usersUrl = keycloakUrl + "/admin/realms/" + realm + "/users?email=" + emailOrUsername;
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminToken);
+            
+            HttpEntity<String> request = new HttpEntity<>(headers);
             ResponseEntity<List> response = restTemplate.exchange(usersUrl, HttpMethod.GET, request, List.class);
             List<Map<String, Object>> users = response.getBody();
+            
+            if (users != null && !users.isEmpty()) {
+                return true;
+            }
+            
+            // If not found by email, try by username
+            usersUrl = keycloakUrl + "/admin/realms/" + realm + "/users?username=" + emailOrUsername;
+            response = restTemplate.exchange(usersUrl, HttpMethod.GET, request, List.class);
+            users = response.getBody();
+            
             return users != null && !users.isEmpty();
         } catch (Exception e) {
+            System.err.println("Error checking if user exists: " + e.getMessage());
             return false;
         }
     }

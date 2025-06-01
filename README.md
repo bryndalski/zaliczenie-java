@@ -127,28 +127,39 @@ make up
 # or: docker-compose up --build
 ```
 
-### 4. Configure Keycloak (First Time Setup)
-1. Visit: **http://localhost/keycloak** (Note: port 80, not 8080!)
-2. Login with admin credentials (see .env file)
-3. Create realm: `microservices-realm`
-4. Create client: `microservices-client`
-5. Configure client settings:
-   - Client Protocol: `openid-connect`
-   - Access Type: `confidential`
-   - Valid Redirect URIs: `*`
-   - Web Origins: `*`
-6. Create roles: `admin`, `user`, `editor`, `observer`
-7. Create test users and assign roles
+### 4. Keycloak Setup (Automatic via Realm Import)
 
-### 5. Start Testing!
+The Keycloak realm and users are automatically imported from `keycloak-realm.json`. 
 
-**🎯 Immediate Access:**
+**Default Users Created:**
+- **Admin**: `admin@admin.com` / `zaq1@WSX`
+- **Test User**: `test@test.com` / `test123`
+
+**To verify setup:**
+1. Visit: **http://localhost/keycloak/admin**
+2. Login with admin credentials from .env file (`admin` / `admin123`)
+3. Check "microservices" realm exists
+4. Verify users are created under Users section
+
+### 5. Test Login!
+
+**🎯 Test with imported users:**
 ```bash
-# Open your browser to:
-open http://localhost/swagger-ui/
+# Login with admin user
+curl -X POST http://localhost/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin@admin.com",
+    "password": "zaq1@WSX"
+  }'
 
-# Or test with curl:
-curl http://localhost/auth/login
+# Login with test user  
+curl -X POST http://localhost/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "test@test.com", 
+    "password": "test123"
+  }'
 ```
 
 ## 📖 API Documentation

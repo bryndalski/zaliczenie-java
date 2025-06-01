@@ -1,7 +1,20 @@
 {
+    "id": "microservices",
     "realm": "microservices",
     "enabled": true,
     "displayName": "Microservices Realm",
+    "loginWithEmailAllowed": true,
+    "duplicateEmailsAllowed": false,
+    "registrationEmailAsUsername": true,
+    "registrationAllowed": false,
+    "resetPasswordAllowed": true,
+    "editUsernameAllowed": false,
+    "bruteForceProtected": false,
+    "defaultDefaultClientScopes": [
+        "email",
+        "profile",
+        "roles"
+    ],
     "clients": [
         {
             "clientId": "microservices-client",
@@ -32,5 +45,54 @@
     },
     "defaultRoles": [
         "user"
+    ],
+    "users": [
+        {
+            "username": "admin@admin.com",
+            "email": "admin@admin.com",
+            "firstName": "Admin",
+            "lastName": "User",
+            "enabled": true,
+            "emailVerified": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "zaq1@WSX",
+                    "temporary": false
+                }
+            ],
+            "realmRoles": [
+                "admin",
+                "user"
+            ],
+            "attributes": {
+                "locale": [
+                    "en"
+                ]
+            }
+        },
+        {
+            "username": "test@test.com",
+            "email": "test@test.com",
+            "firstName": "Test",
+            "lastName": "User",
+            "enabled": true,
+            "emailVerified": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "test123",
+                    "temporary": false
+                }
+            ],
+            "realmRoles": [
+                "user"
+            ],
+            "attributes": {
+                "locale": [
+                    "en"
+                ]
+            }
+        }
     ]
 }

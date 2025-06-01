@@ -12,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -53,20 +54,64 @@ public class AuthService {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "password");
         map.add("client_id", clientId);
-        map.add("client_secret", clientSecret);
-        map.add("username", loginRequest.getUsername());
+        // Only add client_secret if it's not empty (public client doesn't need it)
+        if (clientSecret != null && !clientSecret.trim().isEmpty()) {
+            map.add("client_secret", clientSecret);
+        }
+        
+        // Use email directly as username for Keycloak
+        String emailOrUsername = loginRequest.getUsername();
+        if (!emailOrUsername.contains("@")) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Please use email address to login");
+            error.put("hint", "Login is only allowed with email address, not username");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        
+        map.add("username", emailOrUsername);
         map.add("password", loginRequest.getPassword());
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
         try {
+            System.out.println("Attempting email login to: " + tokenUrl);
+            System.out.println("Client ID: " + clientId);
+            System.out.println("Email: " + emailOrUsername);
+            
             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
             return ResponseEntity.ok(response.getBody());
         } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Invalid credentials");
+            System.err.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Invalid email or password");
+            error.put("details", "Please check your email and password");
+            error.put("keycloak_error", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
+    }
+    
+    private String findUsernameByEmail(String email) {
+        try {
+            String adminToken = keycloakService.getAdminToken();
+            String usersUrl = keycloakUrl + "/admin/realms/" + realm + "/users?email=" + email;
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminToken);
+            
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            ResponseEntity<List> response = restTemplate.exchange(usersUrl, HttpMethod.GET, request, List.class);
+            
+            List<Map<String, Object>> users = response.getBody();
+            if (users != null && !users.isEmpty()) {
+                Map<String, Object> user = users.get(0);
+                return (String) user.get("username");
+            }
+        } catch (Exception e) {
+            System.err.println("Error finding username by email: " + e.getMessage());
+        }
+        return null;
     }
 
     public ResponseEntity<?> logout(String token) {
@@ -121,12 +166,31 @@ public class AuthService {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<?> getCurrentUser(String username) {
-        // Simplified without Spring Security Authentication
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("username", username);
-        userInfo.put("status", "authenticated");
-        return ResponseEntity.ok(userInfo);
+    public ResponseEntity<?> getCurrentUser(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "No valid token provided");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        String token = authorizationHeader.substring(7); // Remove "Bearer " prefix
+
+        try {
+            // Validate token with Keycloak userinfo endpoint
+            String userInfoUrl = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/userinfo";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            ResponseEntity<Map> response = restTemplate.exchange(userInfoUrl, HttpMethod.GET, request, Map.class);
+
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Invalid or expired token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
     }
 
     // Add simple health check method
@@ -135,7 +199,7 @@ public class AuthService {
         health.put("status", "UP");
         health.put("service", "auth-service");
         health.put("timestamp", String.valueOf(System.currentTimeMillis()));
-        
+
         // Check user-service connection
         try {
             boolean userServiceConnected = checkUserServiceConnection();
@@ -143,19 +207,19 @@ public class AuthService {
         } catch (Exception e) {
             health.put("user-service", "ERROR: " + e.getMessage());
         }
-        
+
         return ResponseEntity.ok(health);
     }
-    
+
     private boolean checkUserServiceConnection() {
         try {
             String url = userServiceClient.getUserServiceUrl() + "/health";
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-API-Key", userServiceClient.getApiKey());
-            
+
             HttpEntity<String> request = new HttpEntity<>(headers);
-            
+
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
@@ -194,32 +258,32 @@ public class AuthService {
                 error.put("error", "User with this email already exists");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
             }
-            
+
             // 2. Check if user exists in Keycloak
             if (keycloakService.userExistsInKeycloak(registerRequest.getUsername())) {
                 Map<String, String> error = new HashMap<>();
                 error.put("error", "Username already exists");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
             }
-            
+
             // 3. Create user in user-service first
             Map<String, Object> createdUser = userServiceClient.createUser(
-                registerRequest.getName(),
-                registerRequest.getSurname(),
-                registerRequest.getEmail(),
-                registerRequest.getDateOfBirth().toString(),
-                registerRequest.getRole()
+                    registerRequest.getName(),
+                    registerRequest.getSurname(),
+                    registerRequest.getEmail(),
+                    registerRequest.getDateOfBirth().toString(),
+                    registerRequest.getRole()
             );
-            
+
             // 4. Create user in Keycloak
             boolean keycloakUserCreated = keycloakService.createUser(
-                registerRequest.getUsername(),
-                registerRequest.getEmail(),
-                registerRequest.getPassword(),
-                registerRequest.getName(),
-                registerRequest.getSurname()
+                    registerRequest.getUsername(),
+                    registerRequest.getEmail(),
+                    registerRequest.getPassword(),
+                    registerRequest.getName(),
+                    registerRequest.getSurname()
             );
-            
+
             if (keycloakUserCreated) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("message", "User registered successfully");
@@ -232,7 +296,7 @@ public class AuthService {
                 error.put("error", "Failed to create user in authentication system");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
             }
-            
+
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Registration failed: " + e.getMessage());
