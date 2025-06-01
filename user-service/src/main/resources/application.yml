@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8080}  # Use environment variable, default to 8082
+  port: ${SERVER_PORT:8080}
 
 spring:
   profiles:
@@ -12,9 +12,10 @@ spring:
       username: ${MONGO_USERNAME:user_admin}
       password: ${MONGO_PASSWORD:user_pass123}
 
-logging:
-  level:
-    com.microservices.user: DEBUG
+# API Key configuration
+app:
+  api:
+    key: ${API_KEY:microservice-api-key-2024}
 
 # OpenAPI Configuration
 springdoc:
@@ -23,6 +24,20 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: false
-  servers:
-    - url: /api/users
-      description: User Service API
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.microservices.user: DEBUG
