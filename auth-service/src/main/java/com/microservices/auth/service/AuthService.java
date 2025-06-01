@@ -131,11 +131,36 @@ public class AuthService {
 
     // Add simple health check method
     public ResponseEntity<?> healthCheck() {
-        Map<String, String> health = new HashMap<>();
+        Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
         health.put("service", "auth-service");
         health.put("timestamp", String.valueOf(System.currentTimeMillis()));
+        
+        // Check user-service connection
+        try {
+            boolean userServiceConnected = checkUserServiceConnection();
+            health.put("user-service", userServiceConnected ? "CONNECTED" : "DISCONNECTED");
+        } catch (Exception e) {
+            health.put("user-service", "ERROR: " + e.getMessage());
+        }
+        
         return ResponseEntity.ok(health);
+    }
+    
+    private boolean checkUserServiceConnection() {
+        try {
+            String url = userServiceClient.getUserServiceUrl() + "/health";
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-API-Key", userServiceClient.getApiKey());
+            
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // Add API documentation endpoint as swagger-ui alternative

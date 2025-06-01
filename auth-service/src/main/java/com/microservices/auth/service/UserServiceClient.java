@@ -66,4 +66,13 @@ public class UserServiceClient {
             throw new RuntimeException("Failed to create user in user-service: " + e.getMessage());
         }
     }
+
+    // Add getter methods for health check
+    public String getUserServiceUrl() {
+        return userServiceUrl;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
 }
