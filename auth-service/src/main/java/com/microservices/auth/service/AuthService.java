@@ -17,19 +17,32 @@ import java.util.Map;
 @Service
 public class AuthService {
 
-    @Value("${keycloak.auth-server-url}")
-    private String keycloakUrl;
+    private final KeycloakService keycloakService;
+    private final UserServiceClient userServiceClient;
+    private final RestTemplate restTemplate;
 
-    @Value("${keycloak.realm}")
-    private String realm;
+    private final String keycloakUrl;
+    private final String realm;
+    private final String clientId;
+    private final String clientSecret;
 
-    @Value("${keycloak.resource}")
-    private String clientId;
-
-    @Value("${keycloak.credentials.secret}")
-    private String clientSecret;
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    public AuthService(
+            KeycloakService keycloakService,
+            UserServiceClient userServiceClient,
+            RestTemplate restTemplate,
+            @Value("${keycloak.auth-server-url:http://keycloak:8080}") String keycloakUrl,
+            @Value("${keycloak.realm:microservices}") String realm,
+            @Value("${keycloak.resource:microservices-client}") String clientId,
+            @Value("${keycloak.credentials.secret:}") String clientSecret
+    ) {
+        this.keycloakService = keycloakService;
+        this.userServiceClient = userServiceClient;
+        this.restTemplate = restTemplate;
+        this.keycloakUrl = keycloakUrl;
+        this.realm = realm;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+    }
 
     public ResponseEntity<?> login(LoginRequest loginRequest) {
         String tokenUrl = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/token";
