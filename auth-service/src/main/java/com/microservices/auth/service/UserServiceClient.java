@@ -64,9 +64,20 @@ public class UserServiceClient {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(userRequest, headers);
 
         try {
+            System.out.println("🔑 Creating user in user-service...");
+            System.out.println("URL: " + url);
+            System.out.println("API Key: " + (apiKey != null ? apiKey.substring(0, Math.min(8, apiKey.length())) + "..." : "null"));
+            System.out.println("Request body: " + userRequest);
+
             ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+            System.out.println("✅ User created successfully in user-service");
             return response.getBody();
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            System.err.println("❌ HTTP Error creating user: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            System.err.println("Check API key configuration: '" + apiKey + "'");
+            throw new RuntimeException("Failed to create user in user-service: " + e.getStatusCode() + " : " + e.getResponseBodyAsString());
         } catch (Exception e) {
+            System.err.println("❌ Error creating user: " + e.getMessage());
             throw new RuntimeException("Failed to create user in user-service: " + e.getMessage());
         }
     }

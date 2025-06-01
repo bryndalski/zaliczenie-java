@@ -163,7 +163,7 @@ services:
       AUTH_MONGO_PASSWORD: ${AUTH_MONGO_PASSWORD}
       KEYCLOAK_URL: http://localhost/keycloak
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-      API_KEY: $${USER_API_KEY:-microservice-api-key-2024}
+      API_KEY: ${USER_API_KEY}
       JAVA_OPTS: "-Xmx512m -Xms256m"
     depends_on:
       mongo-users:

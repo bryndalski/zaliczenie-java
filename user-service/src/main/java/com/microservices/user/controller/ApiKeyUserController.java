@@ -29,7 +29,12 @@ public class ApiKeyUserController {
     private String validApiKey;
     
     private boolean isValidApiKey(String apiKey) {
-        return validApiKey.equals(apiKey);
+        System.out.println("🔑 Validating API key...");
+        System.out.println("Received API key: '" + (apiKey != null ? apiKey.substring(0, Math.min(8, apiKey.length())) + "..." : "null") + "'");
+        System.out.println("Expected API key: '" + (validApiKey != null ? validApiKey.substring(0, Math.min(8, validApiKey.length())) + "..." : "null") + "'");
+        boolean isValid = validApiKey.equals(apiKey);
+        System.out.println("API key validation result: " + isValid);
+        return isValid;
     }
     
     @PostMapping
