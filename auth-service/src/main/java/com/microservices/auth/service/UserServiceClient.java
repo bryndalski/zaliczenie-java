@@ -34,10 +34,14 @@ public class UserServiceClient {
         HttpEntity<String> request = new HttpEntity<>(headers);
 
         try {
+            System.out.println("Checking user existence: " + url);
+            System.out.println("Using API key: " + (apiKey != null ? apiKey.substring(0, Math.min(10, apiKey.length())) + "..." : "null"));
+
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
             Map<String, Object> body = response.getBody();
             return body != null && (Boolean) body.get("exists");
         } catch (Exception e) {
+            System.err.println("❌ User service connection failed: " + e.getMessage());
             return false;
         }
     }

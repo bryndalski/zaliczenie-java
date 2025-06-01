@@ -32,6 +32,10 @@ public class KeycloakService {
         this.adminPassword = adminPassword;
     }
     
+    public String getAdminUsername() {
+        return adminUsername;
+    }
+    
     public String getAdminToken() {
         String tokenUrl = keycloakUrl + "/realms/master/protocol/openid-connect/token";
         
@@ -47,10 +51,21 @@ public class KeycloakService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         
         try {
+            System.out.println("Testing Keycloak admin connection...");
+            System.out.println("URL: " + tokenUrl);
+            System.out.println("Username: " + adminUsername);
+            
             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
             Map<String, Object> body = response.getBody();
-            return (String) body.get("access_token");
+            
+            if (body != null && body.containsKey("access_token")) {
+                System.out.println("✅ Keycloak admin authentication successful");
+                return (String) body.get("access_token");
+            } else {
+                throw new RuntimeException("No access token in response");
+            }
         } catch (Exception e) {
+            System.err.println("❌ Keycloak admin authentication failed: " + e.getMessage());
             throw new RuntimeException("Failed to get admin token: " + e.getMessage());
         }
     }

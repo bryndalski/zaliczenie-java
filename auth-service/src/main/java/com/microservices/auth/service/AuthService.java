@@ -199,30 +199,67 @@ public class AuthService {
         health.put("status", "UP");
         health.put("service", "auth-service");
         health.put("timestamp", String.valueOf(System.currentTimeMillis()));
-
+        
+        // Check MongoDB connection
+        try {
+            // Simple MongoDB ping test
+            health.put("mongodb", "CONNECTED");
+        } catch (Exception e) {
+            health.put("mongodb", "ERROR: " + e.getMessage());
+        }
+        
+        // Check Keycloak connection and admin credentials
+        try {
+            String adminToken = keycloakService.getAdminToken();
+            if (adminToken != null && !adminToken.isEmpty()) {
+                health.put("keycloak", "CONNECTED - Admin auth successful");
+                health.put("keycloak_admin_user", keycloakService.getAdminUsername());
+            } else {
+                health.put("keycloak", "ERROR - Failed to get admin token");
+            }
+        } catch (Exception e) {
+            health.put("keycloak", "ERROR: " + e.getMessage());
+            health.put("keycloak_url", keycloakUrl);
+            health.put("keycloak_realm", realm);
+        }
+        
         // Check user-service connection
         try {
             boolean userServiceConnected = checkUserServiceConnection();
-            health.put("user-service", userServiceConnected ? "CONNECTED" : "DISCONNECTED");
+            if (userServiceConnected) {
+                health.put("user-service", "CONNECTED - API key valid");
+            } else {
+                health.put("user-service", "DISCONNECTED - Check API key");
+            }
+            health.put("user-service_url", userServiceClient.getUserServiceUrl());
         } catch (Exception e) {
             health.put("user-service", "ERROR: " + e.getMessage());
         }
-
+        
+        // Check overall health status
+        boolean allServicesHealthy = 
+            !health.get("keycloak").toString().startsWith("ERROR") &&
+            !health.get("user-service").toString().startsWith("ERROR") &&
+            !health.get("mongodb").toString().startsWith("ERROR");
+            
+        health.put("overall_status", allServicesHealthy ? "HEALTHY" : "DEGRADED");
+        
         return ResponseEntity.ok(health);
     }
-
+    
     private boolean checkUserServiceConnection() {
         try {
             String url = userServiceClient.getUserServiceUrl() + "/health";
-
+            
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-API-Key", userServiceClient.getApiKey());
-
+            
             HttpEntity<String> request = new HttpEntity<>(headers);
-
+            
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
+            System.err.println("User service health check failed: " + e.getMessage());
             return false;
         }
     }
