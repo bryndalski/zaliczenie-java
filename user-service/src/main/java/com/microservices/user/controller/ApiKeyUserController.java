@@ -3,6 +3,8 @@ package com.microservices.user.controller;
 import com.microservices.user.model.User;
 import com.microservices.user.service.UserService;
 import com.microservices.user.dto.CreateUserRequest;
+import com.microservices.user.exception.UserNotFoundException;
+import com.microservices.user.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,38 +37,37 @@ public class ApiKeyUserController {
     @ApiResponse(responseCode = "200", description = "User created successfully")
     @ApiResponse(responseCode = "401", description = "Invalid API key")
     @ApiResponse(responseCode = "400", description = "Invalid input or user already exists")
-    public ResponseEntity<User> createUser(
+    public ResponseEntity<?> createUser(
             @RequestHeader("X-API-Key") String apiKey,
             @Valid @RequestBody CreateUserRequest request) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(401).build();
+            ErrorResponse error = new ErrorResponse(401, "Unauthorized", "Invalid API key", "/api-key/users");
+            return ResponseEntity.status(401).body(error);
         }
-        try {
-            User createdUser = userService.createUser(request);
-            return ResponseEntity.ok(createdUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        User createdUser = userService.createUser(request);
+        return ResponseEntity.ok(createdUser);
     }
     
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID (API Key)", description = "Retrieve user by their ID using API key")
-    public ResponseEntity<User> getUserById(
+    public ResponseEntity<?> getUserById(
             @RequestHeader("X-API-Key") String apiKey,
             @PathVariable String id) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(401).build();
+            ErrorResponse error = new ErrorResponse(401, "Unauthorized", "Invalid API key", "/api-key/users/" + id);
+            return ResponseEntity.status(401).body(error);
         }
         return userService.findUserById(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+            .map(user -> ResponseEntity.ok((Object) user))
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
     
     @GetMapping
     @Operation(summary = "Get all users (API Key)", description = "Retrieve all users using API key")
-    public ResponseEntity<List<User>> getAllUsers(@RequestHeader("X-API-Key") String apiKey) {
+    public ResponseEntity<?> getAllUsers(@RequestHeader("X-API-Key") String apiKey) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(401).build();
+            ErrorResponse error = new ErrorResponse(401, "Unauthorized", "Invalid API key", "/api-key/users");
+            return ResponseEntity.status(401).body(error);
         }
         List<User> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
@@ -74,18 +75,15 @@ public class ApiKeyUserController {
     
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user (API Key)", description = "Delete user by ID using API key")
-    public ResponseEntity<Void> deleteUser(
+    public ResponseEntity<?> deleteUser(
             @RequestHeader("X-API-Key") String apiKey,
             @PathVariable String id) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(401).build();
+            ErrorResponse error = new ErrorResponse(401, "Unauthorized", "Invalid API key", "/api-key/users/" + id);
+            return ResponseEntity.status(401).body(error);
         }
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
     
     @GetMapping("/{id}/exists")

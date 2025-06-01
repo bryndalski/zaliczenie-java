@@ -3,6 +3,7 @@ package com.microservices.user.controller;
 import com.microservices.user.dto.CreateUserRequest;
 import com.microservices.user.model.User;
 import com.microservices.user.service.UserService;
+import com.microservices.user.exception.UserNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,12 +29,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input or user already exists")
     public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserRequest request) {
-        try {
-            User createdUser = userService.createUser(request);
-            return ResponseEntity.ok(createdUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        User createdUser = userService.createUser(request);
+        return ResponseEntity.ok(createdUser);
     }
     
     @GetMapping("/{id}")
@@ -43,7 +40,7 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         return userService.findUserById(id)
             .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
     
     @GetMapping
@@ -59,12 +56,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User updated successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
     public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User user) {
-        try {
-            User updatedUser = userService.updateUser(id, user);
-            return ResponseEntity.ok(updatedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        User updatedUser = userService.updateUser(id, user);
+        return ResponseEntity.ok(updatedUser);
     }
     
     @DeleteMapping("/{id}")
@@ -72,12 +65,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User deleted successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
     
     @GetMapping("/email/{email}")
@@ -87,6 +76,6 @@ public class UserController {
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
         return userService.findUserByEmail(email)
             .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+            .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
     }
 }

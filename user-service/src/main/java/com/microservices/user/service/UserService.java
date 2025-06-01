@@ -3,6 +3,7 @@ package com.microservices.user.service;
 import com.microservices.user.dto.CreateUserRequest;
 import com.microservices.user.model.User;
 import com.microservices.user.repository.UserRepository;
+import com.microservices.user.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class UserService {
     
     public User createUser(CreateUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("User with email " + request.getEmail() + " already exists");
+            throw new RuntimeException("User with email '" + request.getEmail() + "' already exists");
         }
         
         // Create new user with auto-generated fields
@@ -59,12 +60,12 @@ public class UserService {
                 user.setUpdatedAt(LocalDateTime.now()); // Auto-update timestamp
                 return userRepository.save(user);
             })
-            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
     
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
+            throw new UserNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
     }

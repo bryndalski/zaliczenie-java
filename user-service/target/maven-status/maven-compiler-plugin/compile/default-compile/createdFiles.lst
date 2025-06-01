@@ -1,10 +1,13 @@
 com/microservices/user/UserServiceApplication.class
-com/microservices/user/controller/HealthController.class
-com/microservices/user/model/User.class
 com/microservices/user/controller/ApiKeyUserController.class
 com/microservices/user/service/UserService.class
-com/microservices/user/dto/CreateUserRequest.class
+com/microservices/user/exception/UserNotFoundException.class
 com/microservices/user/repository/UserRepository.class
 com/microservices/user/model/UserRole.class
 com/microservices/user/config/OpenApiConfig.class
+com/microservices/user/controller/HealthController.class
+com/microservices/user/model/User.class
+com/microservices/user/exception/GlobalExceptionHandler.class
+com/microservices/user/dto/CreateUserRequest.class
+com/microservices/user/dto/ErrorResponse.class
 com/microservices/user/controller/UserController.class
