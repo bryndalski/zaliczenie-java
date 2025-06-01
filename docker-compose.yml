@@ -128,6 +128,10 @@ services:
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
       JAVA_OPTS: "-Xmx512m -Xms256m"
+      # Admin user configuration
+      ADMIN_EMAIL: admin@admin.com
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: zaq1@WSX
       # Make service more tolerant of Keycloak startup delays
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost/keycloak/realms/${KEYCLOAK_REALM}
     depends_on:

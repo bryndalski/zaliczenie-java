@@ -7,6 +7,7 @@ com/microservices/user/model/UserRole.class
 com/microservices/user/config/OpenApiConfig.class
 com/microservices/user/controller/HealthController.class
 com/microservices/user/model/User.class
+com/microservices/user/service/InitializationService.class
 com/microservices/user/exception/GlobalExceptionHandler.class
 com/microservices/user/dto/CreateUserRequest.class
 com/microservices/user/dto/ErrorResponse.class

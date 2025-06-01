@@ -29,6 +29,15 @@ user-service:
   url: ${USER_SERVICE_URL:http://user-service:8080}
   api-key: ${USER_API_KEY:microservice-api-key-2024}
 
+# Default Admin User Configuration
+app:
+  admin:
+    email: ${ADMIN_EMAIL:admin@admin.com}
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:zaq1@WSX}
+    name: ${ADMIN_NAME:Admin}
+    surname: ${ADMIN_SURNAME:User}
+
 # OpenAPI Configuration
 springdoc:
   api-docs:
