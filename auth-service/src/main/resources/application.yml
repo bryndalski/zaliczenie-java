@@ -35,10 +35,10 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
-    enabled: true
-  servers:
-    - url: /api/auth
-      description: Auth Service API
+    enabled: false
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
 
 # Actuator configuration
 management:
