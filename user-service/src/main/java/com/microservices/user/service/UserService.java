@@ -1,5 +1,6 @@
 package com.microservices.user.service;
 
+import com.microservices.user.dto.CreateUserRequest;
 import com.microservices.user.model.User;
 import com.microservices.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +17,22 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     
-    public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("User with email " + user.getEmail() + " already exists");
+    public User createUser(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("User with email " + request.getEmail() + " already exists");
         }
-        if (user.getId() == null || user.getId().isEmpty()) {
-            user.setId(UUID.randomUUID().toString());
-        }
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+        
+        // Create new user with auto-generated fields
+        User user = new User();
+        user.setId(UUID.randomUUID().toString()); // Auto-generated UUID
+        user.setName(request.getName());
+        user.setSurname(request.getSurname());
+        user.setEmail(request.getEmail());
+        user.setDateOfBirth(request.getDateOfBirth());
+        user.setRole(request.getRole());
+        user.setCreatedAt(LocalDateTime.now()); // Auto-generated
+        user.setUpdatedAt(LocalDateTime.now()); // Auto-generated
+        
         return userRepository.save(user);
     }
     
@@ -48,7 +56,7 @@ public class UserService {
                 if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
                 if (updatedUser.getDateOfBirth() != null) user.setDateOfBirth(updatedUser.getDateOfBirth());
                 if (updatedUser.getRole() != null) user.setRole(updatedUser.getRole());
-                user.setUpdatedAt(LocalDateTime.now());
+                user.setUpdatedAt(LocalDateTime.now()); // Auto-update timestamp
                 return userRepository.save(user);
             })
             .orElseThrow(() -> new RuntimeException("User not found with id: " + id));

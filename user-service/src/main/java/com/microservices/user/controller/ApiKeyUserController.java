@@ -2,9 +2,11 @@ package com.microservices.user.controller;
 
 import com.microservices.user.model.User;
 import com.microservices.user.service.UserService;
+import com.microservices.user.dto.CreateUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -32,15 +34,15 @@ public class ApiKeyUserController {
     @Operation(summary = "Create user (API Key)", description = "Create a new user using API key")
     @ApiResponse(responseCode = "200", description = "User created successfully")
     @ApiResponse(responseCode = "401", description = "Invalid API key")
-    @ApiResponse(responseCode = "400", description = "User already exists")
+    @ApiResponse(responseCode = "400", description = "Invalid input or user already exists")
     public ResponseEntity<User> createUser(
             @RequestHeader("X-API-Key") String apiKey,
-            @RequestBody User user) {
+            @Valid @RequestBody CreateUserRequest request) {
         if (!isValidApiKey(apiKey)) {
             return ResponseEntity.status(401).build();
         }
         try {
-            User createdUser = userService.createUser(user);
+            User createdUser = userService.createUser(request);
             return ResponseEntity.ok(createdUser);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();

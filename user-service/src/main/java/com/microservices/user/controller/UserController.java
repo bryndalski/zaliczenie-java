@@ -1,12 +1,15 @@
 package com.microservices.user.controller;
 
+import com.microservices.user.dto.CreateUserRequest;
 import com.microservices.user.model.User;
 import com.microservices.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,18 +17,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @Tag(name = "Users", description = "User management endpoints (JWT protected)")
+@Validated
 public class UserController {
     
     @Autowired
     private UserService userService;
     
     @PostMapping
-    @Operation(summary = "Create user", description = "Create a new user")
+    @Operation(summary = "Create user", description = "Create a new user with auto-generated ID and timestamps")
     @ApiResponse(responseCode = "200", description = "User created successfully")
-    @ApiResponse(responseCode = "400", description = "User already exists")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @ApiResponse(responseCode = "400", description = "Invalid input or user already exists")
+    public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserRequest request) {
         try {
-            User createdUser = userService.createUser(user);
+            User createdUser = userService.createUser(request);
             return ResponseEntity.ok(createdUser);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
