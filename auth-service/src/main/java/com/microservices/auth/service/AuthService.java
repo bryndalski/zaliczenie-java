@@ -2,6 +2,7 @@ package com.microservices.auth.service;
 
 import com.microservices.auth.dto.LoginRequest;
 import com.microservices.auth.dto.RefreshTokenRequest;
+import com.microservices.auth.dto.RegisterRequest;
 import com.microservices.auth.dto.ResetPasswordRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -161,5 +162,59 @@ public class AuthService {
         apiDoc.put("baseUrl", "/auth");
 
         return ResponseEntity.ok(apiDoc);
+    }
+
+    public ResponseEntity<?> register(RegisterRequest registerRequest) {
+        try {
+            // 1. Check if user exists in user-service
+            if (userServiceClient.userExistsByEmail(registerRequest.getEmail())) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "User with this email already exists");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+            }
+            
+            // 2. Check if user exists in Keycloak
+            if (keycloakService.userExistsInKeycloak(registerRequest.getUsername())) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Username already exists");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+            }
+            
+            // 3. Create user in user-service first
+            Map<String, Object> createdUser = userServiceClient.createUser(
+                registerRequest.getName(),
+                registerRequest.getSurname(),
+                registerRequest.getEmail(),
+                registerRequest.getDateOfBirth().toString(),
+                registerRequest.getRole()
+            );
+            
+            // 4. Create user in Keycloak
+            boolean keycloakUserCreated = keycloakService.createUser(
+                registerRequest.getUsername(),
+                registerRequest.getEmail(),
+                registerRequest.getPassword(),
+                registerRequest.getName(),
+                registerRequest.getSurname()
+            );
+            
+            if (keycloakUserCreated) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "User registered successfully");
+                response.put("username", registerRequest.getUsername());
+                response.put("email", registerRequest.getEmail());
+                response.put("userId", createdUser.get("id"));
+                return ResponseEntity.ok(response);
+            } else {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Failed to create user in authentication system");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            }
+            
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Registration failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 }

@@ -205,6 +205,86 @@ curl -X POST http://localhost/graphql \
   }'
 ```
 
+## Authentication Guide
+
+### User Registration
+
+**Endpoint**: `POST /api/auth/register`
+
+**Request Body**:
+```json
+{
+  "username": "john_doe",
+  "password": "securepassword123",
+  "name": "John",
+  "surname": "Doe",
+  "email": "john.doe@example.com",
+  "dateOfBirth": "1990-01-15",
+  "role": "USER"
+}
+```
+
+**Response** (Success):
+```json
+{
+  "message": "User registered successfully",
+  "username": "john_doe",
+  "email": "john.doe@example.com",
+  "userId": "uuid-generated-id"
+}
+```
+
+**cURL Example**:
+```bash
+curl -X POST http://localhost/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "password": "securepassword123",
+    "name": "John",
+    "surname": "Doe",
+    "email": "john.doe@example.com",
+    "dateOfBirth": "1990-01-15",
+    "role": "USER"
+  }'
+```
+
+### User Login
+
+**Endpoint**: `POST /api/auth/login`
+
+**Request Body**:
+```json
+{
+  "username": "john_doe",
+  "password": "securepassword123"
+}
+```
+
+**Response** (Success):
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expires_in": 300,
+  "refresh_expires_in": 1800,
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "not-before-policy": 0,
+  "session_state": "uuid-session-id",
+  "scope": "email profile"
+}
+```
+
+**cURL Example**:
+```bash
+curl -X POST http://localhost/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "password": "securepassword123"
+  }'
+```
+
 ## 🗃️ Database Schemas
 
 ### MongoDB Users Collection

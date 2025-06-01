@@ -25,7 +25,7 @@ public class ApiKeyUserController {
     @Autowired
     private UserService userService;
     
-    @Value("${app.api.key:default-api-key}")
+    @Value("${api.key:microservice-api-key-2024}")
     private String validApiKey;
     
     private boolean isValidApiKey(String apiKey) {

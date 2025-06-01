@@ -1,0 +1,30 @@
+{
+  "realm": "microservices",
+  "enabled": true,
+  "displayName": "Microservices Realm",
+  "clients": [
+    {
+      "clientId": "microservices-client",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect"
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "user"
+      },
+      {
+        "name": "admin"
+      }
+    ]
+  },
+  "defaultRoles": ["user"]
+}

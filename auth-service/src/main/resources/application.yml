@@ -11,6 +11,23 @@ spring:
       database: ${MONGO_DATABASE:auth_db}
       username: ${MONGO_USERNAME:auth_admin}
       password: ${MONGO_PASSWORD:auth_pass123}
+      authentication-database: admin
+
+# Keycloak Configuration
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL:http://keycloak:8080}
+  realm: ${KEYCLOAK_REALM:microservices}
+  resource: ${KEYCLOAK_CLIENT_ID:microservices-client}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:}
+  admin:
+    username: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+
+# User Service Integration
+user-service:
+  url: ${USER_SERVICE_URL:http://user-service:8080}
+  api-key: ${USER_API_KEY:microservice-api-key-2024}
 
 # OpenAPI Configuration
 springdoc:
@@ -18,7 +35,7 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
-    enabled: false
+    enabled: true
   servers:
     - url: /api/auth
       description: Auth Service API

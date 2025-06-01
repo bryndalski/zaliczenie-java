@@ -2,6 +2,7 @@ package com.microservices.auth.controller;
 
 import com.microservices.auth.dto.LoginRequest;
 import com.microservices.auth.dto.RefreshTokenRequest;
+import com.microservices.auth.dto.RegisterRequest;
 import com.microservices.auth.dto.ResetPasswordRequest;
 import com.microservices.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -87,5 +89,16 @@ public class AuthController {
     @Operation(summary = "API Documentation", description = "Get API documentation for auth service")
     public ResponseEntity<?> apiDocs() {
         return authService.getApiDocumentation();
+    }
+
+    @PostMapping("/register")
+    @Operation(summary = "User registration", description = "Register a new user in both user-service and Keycloak")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Registration successful"),
+            @ApiResponse(responseCode = "409", description = "User already exists"),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        return authService.register(registerRequest);
     }
 }
