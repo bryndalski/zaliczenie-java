@@ -51,9 +51,10 @@ public class KeycloakService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         
         try {
-            System.out.println("Testing Keycloak admin connection...");
+            System.out.println("🔐 Testing Keycloak admin connection...");
             System.out.println("URL: " + tokenUrl);
             System.out.println("Username: " + adminUsername);
+            System.out.println("Password length: " + (adminPassword != null ? adminPassword.length() : "null"));
             
             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
             Map<String, Object> body = response.getBody();
@@ -62,10 +63,16 @@ public class KeycloakService {
                 System.out.println("✅ Keycloak admin authentication successful");
                 return (String) body.get("access_token");
             } else {
+                System.err.println("❌ No access token in response: " + body);
                 throw new RuntimeException("No access token in response");
             }
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            System.err.println("❌ HTTP Error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            System.err.println("Check if Keycloak admin user exists and credentials are correct");
+            throw new RuntimeException("Failed to authenticate with Keycloak admin: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
         } catch (Exception e) {
             System.err.println("❌ Keycloak admin authentication failed: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to get admin token: " + e.getMessage());
         }
     }

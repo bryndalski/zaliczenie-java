@@ -22,7 +22,7 @@ keycloak:
     secret: ${KEYCLOAK_CLIENT_SECRET:}
   admin:
     username: ${KEYCLOAK_ADMIN:admin}
-    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin123}
 
 # User Service Integration
 user-service:
