@@ -30,7 +30,7 @@ public class OpenApiConfig {
                 .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement().addList("Bearer Authentication"))
                 .info(new Info()
                         .title("User Service API")
-                        .description("User management microservice with JWT authentication")
+                        .description("User management microservice with JWT authentication via Keycloak")
                         .version("1.0.0"));
     }
 }

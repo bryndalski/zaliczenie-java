@@ -9,6 +9,13 @@ spring:
     authentication:
       username: ${NEO4J_USERNAME:neo4j}
       password: ${NEO4J_PASSWORD:neo4j_pass123}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Use the internal Docker network name for Keycloak
+          issuer-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}
+          jwk-set-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}/protocol/openid-connect/certs
 
 # NO SECURITY CONFIGURATION - Keep it simple
 # Remove the OAuth2 JWT configuration to avoid auth requirements
@@ -37,4 +44,6 @@ logging:
   level:
     com.microservices.note: DEBUG
     org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG
+    org.neo4j.driver: INFO

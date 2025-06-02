@@ -17,6 +17,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
+          # Use the internal Docker network name for Keycloak
           issuer-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}
           jwk-set-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}/protocol/openid-connect/certs
 
@@ -47,3 +48,6 @@ logging:
   level:
     com.microservices.user: DEBUG
     org.springframework.data.mongodb: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG
