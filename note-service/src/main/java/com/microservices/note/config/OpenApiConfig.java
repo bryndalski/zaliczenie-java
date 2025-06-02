@@ -28,9 +28,10 @@ public class OpenApiConfig {
                             .scheme("bearer")
                             .bearerFormat("JWT")
                             .description("Enter JWT token from Keycloak")))
+                .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement().addList("Bearer Authentication"))
                 .info(new Info()
                         .title("Note Service REST API")
-                        .description("Note management with Neo4j database and JWT auth - API docs are public")
+                        .description("Note management with Neo4j database and JWT auth")
                         .version("1.0.0"));
     }
 }
