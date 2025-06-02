@@ -1,4 +1,5 @@
 com/microservices/user/UserServiceApplication.class
+com/microservices/user/config/SecurityConfig.class
 com/microservices/user/controller/ApiKeyUserController.class
 com/microservices/user/service/UserService.class
 com/microservices/user/exception/UserNotFoundException.class

@@ -9,14 +9,11 @@ spring:
     authentication:
       username: ${NEO4J_USERNAME:neo4j}
       password: ${NEO4J_PASSWORD:neo4j_pass123}
-  
-  # Disable Spring Security entirely for now
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
 
-# OpenAPI Configuration - FORCE PUBLIC ACCESS
+# NO SECURITY CONFIGURATION - Keep it simple
+# Remove the OAuth2 JWT configuration to avoid auth requirements
+
+# OpenAPI Configuration - COMPLETELY PUBLIC
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -35,8 +32,6 @@ management:
   endpoint:
     health:
       show-details: always
-  security:
-    enabled: false
 
 logging:
   level:

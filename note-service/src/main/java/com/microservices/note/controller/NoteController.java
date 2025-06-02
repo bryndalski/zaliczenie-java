@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,11 +29,11 @@ public class NoteController {
     @Operation(summary = "Get all user notes", description = "Retrieve all notes accessible to the authenticated user")
     @ApiResponse(responseCode = "200", description = "Notes retrieved successfully")
     public ResponseEntity<Page<Note>> getAllNotes(
-            @RequestParam(defaultValue = "test-user-id") String userId,
+            @AuthenticationPrincipal Jwt jwt,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
-        // For now, use a test user ID since we removed JWT
+        String userId = extractUserIdFromJwt(jwt);
         Pageable pageable = PageRequest.of(page, size);
         Page<Note> notes = noteService.getAllUserNotes(userId, pageable);
         
@@ -42,10 +44,12 @@ public class NoteController {
     @Operation(summary = "Create note", description = "Create a new note with the authenticated user as author")
     @ApiResponse(responseCode = "200", description = "Note created successfully")
     public ResponseEntity<Note> createNote(
-            @RequestParam(defaultValue = "test-user-id") String userId,
-            @RequestParam(defaultValue = "test@example.com") String email,
-            @RequestParam(defaultValue = "testuser") String username,
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody CreateNoteRequest request) {
+        
+        String userId = extractUserIdFromJwt(jwt);
+        String email = jwt.getClaimAsString("email");
+        String username = jwt.getClaimAsString("preferred_username");
         
         Note note = noteService.createNote(request, userId, email, username);
         return ResponseEntity.ok(note);
@@ -57,9 +61,10 @@ public class NoteController {
     @ApiResponse(responseCode = "404", description = "Note not found")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<Note> getNoteById(
-            @PathVariable String id,
-            @RequestParam(defaultValue = "test-user-id") String userId) {
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String id) {
         
+        String userId = extractUserIdFromJwt(jwt);
         Note note = noteService.getNoteById(id, userId);
         return ResponseEntity.ok(note);
     }
@@ -69,10 +74,11 @@ public class NoteController {
     @ApiResponse(responseCode = "200", description = "Note updated successfully")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<Note> updateNote(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String id,
-            @RequestParam(defaultValue = "test-user-id") String userId,
             @Valid @RequestBody UpdateNoteRequest request) {
         
+        String userId = extractUserIdFromJwt(jwt);
         Note note = noteService.updateNote(id, request, userId);
         return ResponseEntity.ok(note);
     }
@@ -82,10 +88,26 @@ public class NoteController {
     @ApiResponse(responseCode = "200", description = "Note deleted successfully")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<Void> deleteNote(
-            @PathVariable String id,
-            @RequestParam(defaultValue = "test-user-id") String userId) {
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String id) {
         
+        String userId = extractUserIdFromJwt(jwt);
         noteService.deleteNote(id, userId);
         return ResponseEntity.ok().build();
+    }
+    
+    private String extractUserIdFromJwt(Jwt jwt) {
+        // Try multiple possible claims for user ID
+        String userId = jwt.getClaimAsString("user_id");
+        if (userId == null) {
+            userId = jwt.getClaimAsString("sub");
+        }
+        if (userId == null) {
+            userId = jwt.getClaimAsString("preferred_username");
+        }
+        if (userId == null) {
+            throw new RuntimeException("No user ID found in JWT token");
+        }
+        return userId;
     }
 }

@@ -2,6 +2,7 @@
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/repository/UserRepository.java
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/exception/NoteNotFoundException.java
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/service/NoteService.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/config/SecurityConfig.java
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/controller/HealthController.java
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/NoteServiceApplication.java
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/dto/UpdateNoteRequest.java

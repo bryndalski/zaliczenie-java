@@ -9,6 +9,7 @@ com/microservices/note/controller/NoteController.class
 com/microservices/note/exception/GlobalExceptionHandler.class
 com/microservices/note/exception/NoteNotFoundException.class
 com/microservices/note/repository/NoteRepository.class
+com/microservices/note/config/SecurityConfig.class
 com/microservices/note/service/NoteService.class
 com/microservices/note/controller/HealthController.class
 com/microservices/note/exception/UnauthorizedAccessException.class

@@ -30,7 +30,37 @@
             "webOrigins": [
                 "*"
             ],
-            "protocol": "openid-connect"
+            "protocol": "openid-connect",
+            "protocolMappers": [
+                {
+                    "name": "user-id-mapper",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "oidc-usermodel-attribute-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "userinfo.token.claim": "true",
+                        "user.attribute": "id",
+                        "id.token.claim": "true",
+                        "access.token.claim": "true",
+                        "claim.name": "user_id",
+                        "jsonType.label": "String"
+                    }
+                },
+                {
+                    "name": "email-mapper",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "oidc-usermodel-property-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "userinfo.token.claim": "true",
+                        "user.attribute": "email",
+                        "id.token.claim": "true",
+                        "access.token.claim": "true",
+                        "claim.name": "email",
+                        "jsonType.label": "String"
+                    }
+                }
+            ]
         }
     ],
     "roles": {
