@@ -23,20 +23,25 @@ public class HealthController {
         health.put("service", "note-service");
         health.put("timestamp", System.currentTimeMillis());
         health.put("version", "1.0.0");
+        health.put("database", "Neo4j");
+        health.put("authentication", "Keycloak JWT");
         return ResponseEntity.ok(health);
     }
 
-    @GetMapping("/notes")
-    @Operation(summary = "Get all notes", description = "Retrieve all notes for testing")
-    @ApiResponse(responseCode = "200", description = "Notes retrieved successfully")
-    public ResponseEntity<?> getAllNotes() {
+    @GetMapping("/api-info")
+    @Operation(summary = "API Information", description = "Get service information")
+    @ApiResponse(responseCode = "200", description = "Service info retrieved")
+    public ResponseEntity<?> apiInfo() {
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Notes endpoint - GraphQL available at /graphql");
+        response.put("message", "Note Service - REST API Only");
         response.put("service", "note-service");
+        response.put("version", "1.0.0");
+        response.put("database", "Neo4j Graph Database");
+        response.put("authentication", "Keycloak JWT");
         response.put("endpoints", Map.of(
-            "graphql", "/graphql",
             "health", "/health",
-            "api-docs", "/v3/api-docs"
+            "api-docs", "/v3/api-docs",
+            "notes", "/notes"
         ));
         return ResponseEntity.ok(response);
     }

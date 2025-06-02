@@ -1,2 +1,15 @@
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/repository/NoteRepository.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/repository/UserRepository.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/exception/NoteNotFoundException.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/service/NoteService.java
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/controller/HealthController.java
 /Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/NoteServiceApplication.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/dto/UpdateNoteRequest.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/dto/CreateNoteRequest.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/model/Note.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/controller/NoteController.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/model/User.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/model/AccessRole.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/exception/GlobalExceptionHandler.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/config/OpenApiConfig.java
+/Users/bryndalski/kodowanie/prywatne/zaliczenie-java/note-service/src/main/java/com/microservices/note/exception/UnauthorizedAccessException.java

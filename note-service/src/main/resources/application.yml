@@ -1,26 +1,28 @@
 server:
-  port: ${SERVER_PORT:8080}  # Changed from 8083 to 8080 to match docker-compose
+  port: 8080
 
 spring:
   profiles:
     active: docker
-  data:
-    neo4j:
-      uri: ${NEO4J_URI:bolt://localhost:7687}
-      authentication:
-        username: ${NEO4J_USERNAME:neo4j}
-        password: ${NEO4J_PASSWORD:password}
+  neo4j:
+    uri: ${NEO4J_URI:bolt://localhost:7687}
+    authentication:
+      username: ${NEO4J_USERNAME:neo4j}
+      password: ${NEO4J_PASSWORD:neo4j_pass123}
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}
+          jwk-set-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}/protocol/openid-connect/certs
 
-# OpenAPI Configuration
+# OpenAPI Configuration - PUBLIC ACCESS
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui.html
-    enabled: false  # Disable built-in swagger UI since we use external one
-  servers:
-    - url: /api/notes
-      description: Note Service API
+    enabled: false
 
 # Actuator configuration
 management:
@@ -35,3 +37,5 @@ management:
 logging:
   level:
     com.microservices.note: DEBUG
+    org.springframework.security: DEBUG
+    org.neo4j.driver: INFO
