@@ -4,7 +4,6 @@ import com.microservices.note.dto.CreateNoteRequest;
 import com.microservices.note.dto.UpdateNoteRequest;
 import com.microservices.note.exception.NoteNotFoundException;
 import com.microservices.note.exception.UnauthorizedAccessException;
-import com.microservices.note.model.AccessRole;
 import com.microservices.note.model.Note;
 import com.microservices.note.repository.NoteRepository;
 import com.microservices.note.repository.UserRepository;
@@ -48,7 +47,7 @@ public class NoteService {
         note = noteRepository.save(note);
         
         // Grant AUTHOR access to creator
-        noteRepository.createUserAccess(userId, note.getId(), AccessRole.AUTHOR);
+        noteRepository.createUserAccess(userId, note.getId(), "AUTHOR");
         
         return note;
     }
@@ -87,16 +86,16 @@ public class NoteService {
     // Access control methods
     private boolean hasReadAccess(String noteId, String userId) {
         return noteRepository.hasAccess(noteId, userId, 
-            Arrays.asList(AccessRole.AUTHOR, AccessRole.EDITOR, AccessRole.SPECTATOR));
+            Arrays.asList("AUTHOR", "EDITOR", "SPECTATOR"));
     }
     
     private boolean hasWriteAccess(String noteId, String userId) {
         return noteRepository.hasAccess(noteId, userId, 
-            Arrays.asList(AccessRole.AUTHOR, AccessRole.EDITOR));
+            Arrays.asList("AUTHOR", "EDITOR"));
     }
     
     private boolean hasAuthorAccess(String noteId, String userId) {
         return noteRepository.hasAccess(noteId, userId, 
-            Arrays.asList(AccessRole.AUTHOR));
+            Arrays.asList("AUTHOR"));
     }
 }

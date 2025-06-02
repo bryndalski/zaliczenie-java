@@ -10,19 +10,21 @@ spring:
       username: ${NEO4J_USERNAME:neo4j}
       password: ${NEO4J_PASSWORD:neo4j_pass123}
   
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}
-          jwk-set-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}/protocol/openid-connect/certs
+  # Disable Spring Security entirely for now
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
 
-# OpenAPI Configuration - PUBLIC ACCESS
+# OpenAPI Configuration - FORCE PUBLIC ACCESS
 springdoc:
   api-docs:
     path: /v3/api-docs
+    enabled: true
   swagger-ui:
     enabled: false
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
 
 # Actuator configuration
 management:
@@ -33,9 +35,11 @@ management:
   endpoint:
     health:
       show-details: always
+  security:
+    enabled: false
 
 logging:
   level:
     com.microservices.note: DEBUG
     org.springframework.security: DEBUG
-    org.neo4j.driver: INFO
+    org.springframework.web: DEBUG

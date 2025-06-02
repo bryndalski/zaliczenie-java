@@ -15,26 +15,28 @@ import java.util.List;
 public interface NoteRepository extends Neo4jRepository<Note, String> {
     
     @Query(value = """
-        MATCH (u:User {userId: $userId})-[r:AUTHOR|EDITOR|SPECTATOR]->(n:Note)
+        MATCH (u:User {userId: $userId})-[r:HAS_ACCESS]->(n:Note)
+        WHERE r.role IN ['AUTHOR', 'EDITOR', 'SPECTATOR']
         RETURN n
         ORDER BY n.updatedAt DESC
         """,
         countQuery = """
-        MATCH (u:User {userId: $userId})-[r:AUTHOR|EDITOR|SPECTATOR]->(n:Note)
+        MATCH (u:User {userId: $userId})-[r:HAS_ACCESS]->(n:Note)
+        WHERE r.role IN ['AUTHOR', 'EDITOR', 'SPECTATOR']
         RETURN count(n)
         """)
     Page<Note> findAllByUserId(@Param("userId") String userId, Pageable pageable);
     
     @Query("""
-        MATCH (u:User {userId: $userId})-[r]->(n:Note {id: $noteId})
-        WHERE type(r) IN $roles
+        MATCH (u:User {userId: $userId})-[r:HAS_ACCESS]->(n:Note {id: $noteId})
+        WHERE r.role IN $roles
         RETURN count(n) > 0
         """)
-    boolean hasAccess(@Param("noteId") String noteId, @Param("userId") String userId, @Param("roles") List<AccessRole> roles);
+    boolean hasAccess(@Param("noteId") String noteId, @Param("userId") String userId, @Param("roles") List<String> roles);
     
     @Query("""
         MATCH (u:User {userId: $userId}), (n:Note {id: $noteId})
-        CREATE (u)-[r:$role {grantedAt: datetime()}]->(n)
+        CREATE (u)-[:HAS_ACCESS {role: $role, grantedAt: datetime()}]->(n)
         """)
-    void createUserAccess(@Param("userId") String userId, @Param("noteId") String noteId, @Param("role") AccessRole role);
+    void createUserAccess(@Param("userId") String userId, @Param("noteId") String noteId, @Param("role") String role);
 }

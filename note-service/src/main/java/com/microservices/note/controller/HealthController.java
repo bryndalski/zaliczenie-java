@@ -45,4 +45,14 @@ public class HealthController {
         ));
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/test-public")
+    @Operation(summary = "Test public endpoint", description = "Test endpoint that should be publicly accessible")
+    @ApiResponse(responseCode = "200", description = "Public endpoint working")
+    public ResponseEntity<?> testPublic() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "This endpoint is public - no JWT required");
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
 }

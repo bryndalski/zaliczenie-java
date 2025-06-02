@@ -13,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,11 +27,11 @@ public class NoteController {
     @Operation(summary = "Get all user notes", description = "Retrieve all notes accessible to the authenticated user")
     @ApiResponse(responseCode = "200", description = "Notes retrieved successfully")
     public ResponseEntity<Page<Note>> getAllNotes(
-            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(defaultValue = "test-user-id") String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
-        String userId = jwt.getClaimAsString("sub");
+        // For now, use a test user ID since we removed JWT
         Pageable pageable = PageRequest.of(page, size);
         Page<Note> notes = noteService.getAllUserNotes(userId, pageable);
         
@@ -44,12 +42,10 @@ public class NoteController {
     @Operation(summary = "Create note", description = "Create a new note with the authenticated user as author")
     @ApiResponse(responseCode = "200", description = "Note created successfully")
     public ResponseEntity<Note> createNote(
-            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(defaultValue = "test-user-id") String userId,
+            @RequestParam(defaultValue = "test@example.com") String email,
+            @RequestParam(defaultValue = "testuser") String username,
             @Valid @RequestBody CreateNoteRequest request) {
-        
-        String userId = jwt.getClaimAsString("sub");
-        String email = jwt.getClaimAsString("email");
-        String username = jwt.getClaimAsString("preferred_username");
         
         Note note = noteService.createNote(request, userId, email, username);
         return ResponseEntity.ok(note);
@@ -61,10 +57,9 @@ public class NoteController {
     @ApiResponse(responseCode = "404", description = "Note not found")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<Note> getNoteById(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable String id) {
+            @PathVariable String id,
+            @RequestParam(defaultValue = "test-user-id") String userId) {
         
-        String userId = jwt.getClaimAsString("sub");
         Note note = noteService.getNoteById(id, userId);
         return ResponseEntity.ok(note);
     }
@@ -74,11 +69,10 @@ public class NoteController {
     @ApiResponse(responseCode = "200", description = "Note updated successfully")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<Note> updateNote(
-            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String id,
+            @RequestParam(defaultValue = "test-user-id") String userId,
             @Valid @RequestBody UpdateNoteRequest request) {
         
-        String userId = jwt.getClaimAsString("sub");
         Note note = noteService.updateNote(id, request, userId);
         return ResponseEntity.ok(note);
     }
@@ -88,10 +82,9 @@ public class NoteController {
     @ApiResponse(responseCode = "200", description = "Note deleted successfully")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<Void> deleteNote(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable String id) {
+            @PathVariable String id,
+            @RequestParam(defaultValue = "test-user-id") String userId) {
         
-        String userId = jwt.getClaimAsString("sub");
         noteService.deleteNote(id, userId);
         return ResponseEntity.ok().build();
     }
