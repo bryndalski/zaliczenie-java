@@ -161,16 +161,22 @@ services:
       AUTH_MONGO_DATABASE: ${AUTH_MONGO_DATABASE}
       AUTH_MONGO_USERNAME: ${AUTH_MONGO_USERNAME}
       AUTH_MONGO_PASSWORD: ${AUTH_MONGO_PASSWORD}
-      KEYCLOAK_URL: http://localhost/keycloak
+      KEYCLOAK_URL: http://keycloak:8080
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: ${USER_KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_CLIENT_SECRET: ${USER_KEYCLOAK_CLIENT_SECRET}
       API_KEY: ${USER_API_KEY}
       JAVA_OPTS: "-Xmx512m -Xms256m"
+      # OAuth2 Resource Server configuration
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost/keycloak/realms/${KEYCLOAK_REALM}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
     depends_on:
       mongo-users:
         condition: service_healthy
       mongo-passwords:
         condition: service_healthy
-      # Remove Keycloak dependency temporarily
+      keycloak:
+        condition: service_healthy
     networks:
       - microservices-network
     healthcheck:
