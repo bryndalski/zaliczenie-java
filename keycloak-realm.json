@@ -1,0 +1,128 @@
+{
+    "id": "microservices",
+    "realm": "microservices",
+    "enabled": true,
+    "displayName": "Microservices Realm",
+    "loginWithEmailAllowed": true,
+    "duplicateEmailsAllowed": false,
+    "registrationEmailAsUsername": true,
+    "registrationAllowed": false,
+    "resetPasswordAllowed": true,
+    "editUsernameAllowed": false,
+    "bruteForceProtected": false,
+    "defaultDefaultClientScopes": [
+        "email",
+        "profile",
+        "roles"
+    ],
+    "clients": [
+        {
+            "clientId": "microservices-client",
+            "enabled": true,
+            "publicClient": true,
+            "directAccessGrantsEnabled": true,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": false,
+            "serviceAccountsEnabled": false,
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ],
+            "protocol": "openid-connect",
+            "protocolMappers": [
+                {
+                    "name": "user-id-mapper",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "oidc-usermodel-attribute-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "userinfo.token.claim": "true",
+                        "user.attribute": "id",
+                        "id.token.claim": "true",
+                        "access.token.claim": "true",
+                        "claim.name": "user_id",
+                        "jsonType.label": "String"
+                    }
+                },
+                {
+                    "name": "email-mapper",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "oidc-usermodel-property-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "userinfo.token.claim": "true",
+                        "user.attribute": "email",
+                        "id.token.claim": "true",
+                        "access.token.claim": "true",
+                        "claim.name": "email",
+                        "jsonType.label": "String"
+                    }
+                }
+            ]
+        }
+    ],
+    "roles": {
+        "realm": [
+            {
+                "name": "user"
+            },
+            {
+                "name": "admin"
+            }
+        ]
+    },
+    "defaultRoles": [
+        "user"
+    ],
+    "users": [
+        {
+            "username": "admin@admin.com",
+            "email": "admin@admin.com",
+            "firstName": "Admin",
+            "lastName": "User",
+            "enabled": true,
+            "emailVerified": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "zaq1@WSX",
+                    "temporary": false
+                }
+            ],
+            "realmRoles": [
+                "admin",
+                "user"
+            ],
+            "attributes": {
+                "locale": [
+                    "en"
+                ]
+            }
+        },
+        {
+            "username": "test@test.com",
+            "email": "test@test.com",
+            "firstName": "Test",
+            "lastName": "User",
+            "enabled": true,
+            "emailVerified": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "test123",
+                    "temporary": false
+                }
+            ],
+            "realmRoles": [
+                "user"
+            ],
+            "attributes": {
+                "locale": [
+                    "en"
+                ]
+            }
+        }
+    ]
+}

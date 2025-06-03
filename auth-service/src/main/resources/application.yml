@@ -1,0 +1,66 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: docker
+  data:
+    mongodb:
+      host: ${MONGO_HOST:localhost}
+      port: ${MONGO_PORT:27017}
+      database: ${MONGO_DATABASE:auth_db}
+      username: ${MONGO_USERNAME:auth_admin}
+      password: ${MONGO_PASSWORD:auth_pass123}
+      authentication-database: admin
+
+# Keycloak Configuration
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL:http://keycloak:8080}
+  realm: ${KEYCLOAK_REALM:microservices}
+  resource: ${KEYCLOAK_CLIENT_ID:microservices-client}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:}
+  admin:
+    username: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin123}
+
+# User Service Integration
+user-service:
+  url: ${USER_SERVICE_URL:http://user-service:8080}
+  api-key: ${USER_API_KEY:microservice-api-key-2024}
+
+# Default Admin User Configuration
+app:
+  admin:
+    email: ${ADMIN_EMAIL:admin@admin.com}
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:zaq1@WSX}
+    name: ${ADMIN_NAME:Admin}
+    surname: ${ADMIN_SURNAME:User}
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: false
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "[%level]-%d{yyyy-MM-dd HH:mm:ss.SSS}-[auth-service]-%msg%n"
+  level:
+    com.microservices.auth: DEBUG

@@ -1,0 +1,55 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  profiles:
+    active: docker
+  data:
+    mongodb:
+      host: ${MONGO_HOST:localhost}
+      port: ${MONGO_PORT:27017}
+      database: ${MONGO_DATABASE:users_db}
+      username: ${MONGO_USERNAME:user_admin}
+      password: ${MONGO_PASSWORD:user_pass123}
+      authentication-database: admin
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Use the internal Docker network name for Keycloak
+          issuer-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}
+          jwk-set-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}/protocol/openid-connect/certs
+
+# API Key configuration
+app:
+  api:
+    key: ${API_KEY:microservice-api-key-2024}
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    enabled: false
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "[%level]-%d{yyyy-MM-dd HH:mm:ss.SSS}-[user-service]-%msg%n"
+  level:
+    com.microservices.user: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG

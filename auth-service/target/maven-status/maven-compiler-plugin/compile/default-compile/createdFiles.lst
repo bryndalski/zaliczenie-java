@@ -1,0 +1,13 @@
+com/microservices/auth/service/KeycloakService.class
+com/microservices/auth/config/RestTemplateConfig.class
+com/microservices/auth/controller/AuthController.class
+com/microservices/auth/service/InitializationService.class
+com/microservices/auth/dto/RegisterRequest.class
+com/microservices/auth/dto/LoginRequest.class
+com/microservices/auth/dto/ResetPasswordRequest.class
+com/microservices/auth/service/AuthService.class
+com/microservices/auth/AuthServiceApplication.class
+com/microservices/auth/dto/RefreshTokenRequest.class
+com/microservices/auth/service/KeycloakInitializationService.class
+com/microservices/auth/service/UserServiceClient.class
+com/microservices/auth/config/OpenApiConfig.class

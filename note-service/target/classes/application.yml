@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: docker
+  neo4j:
+    uri: ${NEO4J_URI:bolt://localhost:7687}
+    authentication:
+      username: ${NEO4J_USERNAME:neo4j}
+      password: ${NEO4J_PASSWORD:neo4j_pass123}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Use the internal Docker network name for Keycloak
+          issuer-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}
+          jwk-set-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/${KEYCLOAK_REALM:microservices}/protocol/openid-connect/certs
+
+# NO SECURITY CONFIGURATION - Keep it simple
+# Remove the OAuth2 JWT configuration to avoid auth requirements
+
+# OpenAPI Configuration - COMPLETELY PUBLIC
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    enabled: false
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "[%level]-%d{yyyy-MM-dd HH:mm:ss.SSS}-[note-service]-%msg%n"
+  level:
+    com.microservices.note: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG
+    org.neo4j.driver: INFO

@@ -1,0 +1,16 @@
+com/microservices/note/dto/UpdateNoteRequest.class
+com/microservices/note/model/Note.class
+com/microservices/note/config/OpenApiConfig.class
+com/microservices/note/NoteServiceApplication.class
+com/microservices/note/dto/CreateNoteRequest.class
+com/microservices/note/model/AccessRole.class
+com/microservices/note/model/User.class
+com/microservices/note/controller/NoteController.class
+com/microservices/note/exception/GlobalExceptionHandler.class
+com/microservices/note/exception/NoteNotFoundException.class
+com/microservices/note/repository/NoteRepository.class
+com/microservices/note/config/SecurityConfig.class
+com/microservices/note/service/NoteService.class
+com/microservices/note/controller/HealthController.class
+com/microservices/note/exception/UnauthorizedAccessException.class
+com/microservices/note/repository/UserRepository.class
