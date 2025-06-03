@@ -67,11 +67,9 @@ public class KeycloakService {
                 throw new RuntimeException("No access token in response");
             }
         } catch (org.springframework.web.client.HttpClientErrorException e) {
-            System.err.println("❌ HTTP Error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
             System.err.println("Check if Keycloak admin user exists and credentials are correct");
             throw new RuntimeException("Failed to authenticate with Keycloak admin: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            System.err.println("❌ Keycloak admin authentication failed: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Failed to get admin token: " + e.getMessage());
         }

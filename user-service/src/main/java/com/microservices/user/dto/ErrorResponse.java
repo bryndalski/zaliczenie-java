@@ -28,7 +28,6 @@ public class ErrorResponse {
         this.details = details;
     }
     
-    // Getters and Setters
     public int getStatus() { return status; }
     public void setStatus(int status) { this.status = status; }
     

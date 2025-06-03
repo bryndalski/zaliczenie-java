@@ -58,7 +58,6 @@ public class UserController {
         
         String currentUserId = extractUserIdFromJwt(jwt);
         
-        // Users can only access their own profile unless they are admin
         if (!currentUserId.equals(id) && !hasAdminRole(jwt)) {
             throw new RuntimeException("Access denied: You can only access your own profile");
         }

@@ -58,7 +58,6 @@ public class AuthService {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "password");
         map.add("client_id", clientId);
-        // Only add client_secret if it's not empty (public client doesn't need it)
         if (clientSecret != null && !clientSecret.trim().isEmpty()) {
             map.add("client_secret", clientSecret);
         }
@@ -96,27 +95,7 @@ public class AuthService {
         }
     }
     
-    private String findUsernameByEmail(String email) {
-        try {
-            String adminToken = keycloakService.getAdminToken();
-            String usersUrl = keycloakUrl + "/admin/realms/" + realm + "/users?email=" + email;
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(adminToken);
-            
-            HttpEntity<String> request = new HttpEntity<>(headers);
-            ResponseEntity<List> response = restTemplate.exchange(usersUrl, HttpMethod.GET, request, List.class);
-            
-            List<Map<String, Object>> users = response.getBody();
-            if (users != null && !users.isEmpty()) {
-                Map<String, Object> user = users.get(0);
-                return (String) user.get("username");
-            }
-        } catch (Exception e) {
-            System.err.println("Error finding username by email: " + e.getMessage());
-        }
-        return null;
-    }
+    
 
     public ResponseEntity<?> logout(String token) {
         String logoutUrl = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/logout";
@@ -164,7 +143,6 @@ public class AuthService {
     }
 
     public ResponseEntity<?> resetPassword(ResetPasswordRequest resetRequest) {
-        // Implementation for password reset via Keycloak Admin API
         Map<String, String> response = new HashMap<>();
         response.put("message", "Password reset initiated");
         return ResponseEntity.ok(response);
@@ -180,7 +158,7 @@ public class AuthService {
         String token = authorizationHeader.substring(7); // Remove "Bearer " prefix
 
         try {
-            // Validate token with Keycloak userinfo endpoint
+            // Validate token with Keycloak 
             String userInfoUrl = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/userinfo";
 
             HttpHeaders headers = new HttpHeaders();
@@ -197,14 +175,13 @@ public class AuthService {
         }
     }
 
-    // Add simple health check method
+
     public ResponseEntity<?> healthCheck() {
         Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
         health.put("service", "auth-service");
         health.put("timestamp", String.valueOf(System.currentTimeMillis()));
         
-        // Check MongoDB connection with actual ping
         try {
             mongoTemplate.getDb().runCommand(new org.bson.Document("ping", 1));
             health.put("mongodb", "CONNECTED");
@@ -212,7 +189,6 @@ public class AuthService {
             health.put("mongodb", "ERROR: " + e.getMessage());
         }
         
-        // Check Keycloak connection and admin credentials
         try {
             String adminToken = keycloakService.getAdminToken();
             if (adminToken != null && !adminToken.isEmpty()) {
@@ -227,7 +203,6 @@ public class AuthService {
             health.put("keycloak_realm", realm);
         }
         
-        // Check user-service connection
         try {
             boolean userServiceConnected = checkUserServiceConnection();
             if (userServiceConnected) {
@@ -240,7 +215,6 @@ public class AuthService {
             health.put("user-service", "ERROR: " + e.getMessage());
         }
         
-        // Check overall health status
         boolean allServicesHealthy = 
             !health.get("keycloak").toString().startsWith("ERROR") &&
             !health.get("user-service").toString().startsWith("ERROR") &&
@@ -293,21 +267,18 @@ public class AuthService {
 
     public ResponseEntity<?> register(RegisterRequest registerRequest) {
         try {
-            // 1. Check if user exists in user-service
             if (userServiceClient.userExistsByEmail(registerRequest.getEmail())) {
                 Map<String, String> error = new HashMap<>();
                 error.put("error", "User with this email already exists");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
             }
 
-            // 2. Check if user exists in Keycloak
             if (keycloakService.userExistsInKeycloak(registerRequest.getUsername())) {
                 Map<String, String> error = new HashMap<>();
                 error.put("error", "Username already exists");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
             }
 
-            // 3. Create user in user-service first
             Map<String, Object> createdUser = userServiceClient.createUser(
                     registerRequest.getName(),
                     registerRequest.getSurname(),
@@ -316,7 +287,6 @@ public class AuthService {
                     registerRequest.getRole()
             );
 
-            // 4. Create user in Keycloak
             boolean keycloakUserCreated = keycloakService.createUser(
                     registerRequest.getUsername(),
                     registerRequest.getEmail(),

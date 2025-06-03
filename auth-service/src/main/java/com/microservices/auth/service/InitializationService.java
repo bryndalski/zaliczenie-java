@@ -35,14 +35,14 @@ public class InitializationService implements CommandLineRunner {
                     "ADMIN"
                 );
                 
-                System.out.println("✅ Admin user profile created in user-service:");
+                System.out.println("Admin user profile created in user-service:");
                 System.out.println("   Email: " + adminEmail);
                 System.out.println("   Note: Login credentials are handled by Keycloak realm import");
             } else {
-                System.out.println("ℹ️ Admin user profile already exists in user-service");
+                System.out.println("Admin user profile already exists in user-service");
             }
         } catch (Exception e) {
-            System.err.println("❌ Failed to create admin user profile: " + e.getMessage());
+            System.err.println("Failed to create admin user profile: " + e.getMessage());
         }
     }
 }

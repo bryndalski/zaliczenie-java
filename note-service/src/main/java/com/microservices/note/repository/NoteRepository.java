@@ -1,6 +1,5 @@
 package com.microservices.note.repository;
 
-import com.microservices.note.model.AccessRole;
 import com.microservices.note.model.Note;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

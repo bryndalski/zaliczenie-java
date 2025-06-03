@@ -41,7 +41,7 @@ public class UserServiceClient {
             Map<String, Object> body = response.getBody();
             return body != null && (Boolean) body.get("exists");
         } catch (Exception e) {
-            System.err.println("❌ User service connection failed: " + e.getMessage());
+            System.err.println("User service connection failed: " + e.getMessage());
             return false;
         }
     }

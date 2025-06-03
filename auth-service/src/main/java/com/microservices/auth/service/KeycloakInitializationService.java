@@ -39,21 +39,20 @@ public class KeycloakInitializationService implements CommandLineRunner {
         }
         
         try {
-            // Just verify users exist - don't create them
             boolean adminExists = keycloakService.userExistsInKeycloak("admin@admin.com");
             boolean testExists = keycloakService.userExistsInKeycloak("test@test.com");
             
-            System.out.println("📊 Keycloak User Status:");
-            System.out.println("   Admin user (admin@admin.com): " + (adminExists ? "✅ EXISTS" : "❌ MISSING"));
-            System.out.println("   Test user (test@test.com): " + (testExists ? "✅ EXISTS" : "❌ MISSING"));
+            System.out.println("Keycloak User Status:");
+            System.out.println("   Admin user (admin@admin.com): " + (adminExists ? "EXISTS" : "MISSING"));
+            System.out.println("   Test user (test@test.com): " + (testExists ? "EXISTS" :  "MISSING"));
             
             if (!adminExists || !testExists) {
-                System.err.println("⚠️ Users are missing from Keycloak realm import!");
-                System.err.println("⚠️ Check if keycloak-realm.json is properly mounted and imported");
+                System.err.println("Users are missing from Keycloak realm import!");
+                System.err.println("Check if keycloak-realm.json is properly mounted and imported");
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Error checking Keycloak users: " + e.getMessage());
+            System.err.println("Error checking Keycloak users: " + e.getMessage());
         }
     }
 }
