@@ -41,6 +41,8 @@ management:
       show-details: always
 
 logging:
+  pattern:
+    console: "[%level]-%d{yyyy-MM-dd HH:mm:ss.SSS}-[note-service]-%msg%n"
   level:
     com.microservices.note: DEBUG
     org.springframework.security: DEBUG

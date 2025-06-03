@@ -45,6 +45,8 @@ management:
       show-details: always
 
 logging:
+  pattern:
+    console: "[%level]-%d{yyyy-MM-dd HH:mm:ss.SSS}-[user-service]-%msg%n"
   level:
     com.microservices.user: DEBUG
     org.springframework.data.mongodb: DEBUG
