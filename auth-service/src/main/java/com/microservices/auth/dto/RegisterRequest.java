@@ -28,9 +28,8 @@ public class RegisterRequest {
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
     
-    private String role = "USER"; // Default role
+    private String role = "USER"; 
     
-    // Getters and Setters
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     
