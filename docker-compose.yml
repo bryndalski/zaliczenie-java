@@ -87,8 +87,7 @@ services:
       retries: 15  # More retries
       start_period: 120s  # Reduced start period
     restart: unless-stopped
-    ports:
-      - "8095:8080"  # Changed from 8080:8080 to avoid conflicts
+   
 
   keycloak-db:
     image: postgres:15
@@ -145,8 +144,7 @@ services:
       retries: 5
       start_period: 90s  # Increased due to potential Keycloak delays
     restart: unless-stopped
-    ports:
-      - "8091:8080"
+
 
   user-service:
     build: ./user-service
@@ -186,8 +184,7 @@ services:
       retries: 5
       start_period: 90s
     restart: unless-stopped
-    ports:
-      - "8092:8080"
+  
 
   note-service:
     build: ./note-service
@@ -218,8 +215,7 @@ services:
       retries: 5
       start_period: 90s
     restart: unless-stopped
-    ports:
-      - "8093:8080"
+
 
   mongo-users:
     image: mongo:7

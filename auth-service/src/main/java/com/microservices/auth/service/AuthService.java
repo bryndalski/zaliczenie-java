@@ -5,6 +5,7 @@ import com.microservices.auth.dto.RefreshTokenRequest;
 import com.microservices.auth.dto.RegisterRequest;
 import com.microservices.auth.dto.ResetPasswordRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,6 +22,7 @@ public class AuthService {
     private final KeycloakService keycloakService;
     private final UserServiceClient userServiceClient;
     private final RestTemplate restTemplate;
+    private final MongoTemplate mongoTemplate;
 
     private final String keycloakUrl;
     private final String realm;
@@ -31,6 +33,7 @@ public class AuthService {
             KeycloakService keycloakService,
             UserServiceClient userServiceClient,
             RestTemplate restTemplate,
+            MongoTemplate mongoTemplate,
             @Value("${keycloak.auth-server-url:http://keycloak:8080}") String keycloakUrl,
             @Value("${keycloak.realm:microservices}") String realm,
             @Value("${keycloak.resource:microservices-client}") String clientId,
@@ -39,6 +42,7 @@ public class AuthService {
         this.keycloakService = keycloakService;
         this.userServiceClient = userServiceClient;
         this.restTemplate = restTemplate;
+        this.mongoTemplate = mongoTemplate;
         this.keycloakUrl = keycloakUrl;
         this.realm = realm;
         this.clientId = clientId;
@@ -200,9 +204,9 @@ public class AuthService {
         health.put("service", "auth-service");
         health.put("timestamp", String.valueOf(System.currentTimeMillis()));
         
-        // Check MongoDB connection
+        // Check MongoDB connection with actual ping
         try {
-            // Simple MongoDB ping test
+            mongoTemplate.getDb().runCommand(new org.bson.Document("ping", 1));
             health.put("mongodb", "CONNECTED");
         } catch (Exception e) {
             health.put("mongodb", "ERROR: " + e.getMessage());
